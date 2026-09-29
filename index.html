@@ -125,6 +125,39 @@
     cursor: pointer;
     color: var(--dark);
   }
+  .search-form {
+    display: flex;
+    align-items: center;
+    background: #fff;
+    border-radius: 30px;
+    border: 2px solid #f0e2d2;
+    padding: 4px 4px 4px 16px;
+    transition: border-color .25s;
+  }
+  .search-form:focus-within { border-color: var(--primary); }
+  .search-form input {
+    border: none;
+    outline: none;
+    background: transparent;
+    font-family: inherit;
+    font-size: .9rem;
+    width: 150px;
+    color: var(--dark);
+  }
+  .search-form button {
+    background: var(--primary);
+    border: none;
+    color: #fff;
+    width: 36px; height: 36px;
+    border-radius: 50%;
+    cursor: pointer;
+    font-size: 1rem;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    transition: background .25s;
+  }
+  .search-form button:hover { background: var(--primary-dark); }
 
   /* ============ Hero ============ */
   .hero {
@@ -705,6 +738,79 @@
     line-height: 1.8;
   }
 
+  /* 搜索结果弹窗 */
+  .found-photo {
+    display: block;
+    width: 230px;
+    max-width: 100%;
+    margin: 6px auto 20px;
+    border-radius: 14px;
+    box-shadow: 0 12px 30px rgba(0, 0, 0, .35);
+  }
+  .found-text {
+    font-size: 1.3rem;
+    font-weight: 800;
+    color: var(--dark);
+    letter-spacing: 1px;
+  }
+
+  /* 搜索弹窗:更大 + 边抖动边四处乱跑 */
+  #searchModal .chef-modal-box {
+    width: min(580px, 94vw);
+    padding: 38px 34px 34px;
+  }
+  #searchModal .found-photo { width: 380px; }
+  #searchModal .found-text { font-size: 1.9rem; }
+  #searchModal.crazy .chef-modal-box {
+    position: absolute;
+    margin: 0;
+    animation: crazyShake .3s linear infinite;
+  }
+  @keyframes crazyShake {
+    0% { transform: rotate(calc(var(--rot, 0deg) - 2deg)) translate(-2px, -2px); }
+    25% { transform: rotate(calc(var(--rot, 0deg) + 2.5deg)) translate(2px, -3px); }
+    50% { transform: rotate(calc(var(--rot, 0deg) - 2.5deg)) translate(-3px, 2px); }
+    75% { transform: rotate(calc(var(--rot, 0deg) + 3deg)) translate(3px, 3px); }
+    100% { transform: rotate(calc(var(--rot, 0deg) - 2deg)) translate(-2px, -2px); }
+  }
+
+  /* ============ 隐藏反转界面(彩蛋) ============ */
+  #hiddenOverlay {
+    position: fixed;
+    inset: 0;
+    z-index: 8000;
+    pointer-events: none;
+    -webkit-backdrop-filter: invert(1) hue-rotate(180deg);
+    backdrop-filter: invert(1) hue-rotate(180deg);
+    background:
+      radial-gradient(ellipse at center, rgba(120, 0, 0, .12), rgba(60, 0, 0, .38)),
+      linear-gradient(rgba(80, 0, 0, .12), rgba(25, 0, 0, .32));
+    opacity: 0;
+    transition: opacity 1s ease;
+  }
+  #hiddenOverlay.show { opacity: 1; }
+  #exitHiddenBtn {
+    position: fixed;
+    top: 16px; left: 16px;
+    z-index: 8001;
+    padding: 9px 20px;
+    border-radius: 26px;
+    border: 2px solid #c00;
+    background: rgba(255, 255, 255, .92);
+    color: #c00;
+    font-weight: 800;
+    font-size: .92rem;
+    cursor: pointer;
+    opacity: 0;
+    pointer-events: none;
+    transition: opacity .4s;
+  }
+  #hiddenOverlay.show #exitHiddenBtn {
+    opacity: 1;
+    pointer-events: auto;
+  }
+  #exitHiddenBtn:hover { background: #c00; color: #fff; }
+
   /* ============ 爱意模式 ============ */
   /* 提交预订后:隐藏原生光标,改用自定义加粗"爱"字光标 */
   body.love-mode,
@@ -849,6 +955,7 @@
     .form-row { grid-template-columns: 1fr; }
     .footer-grid { grid-template-columns: 1fr; }
     .booking-box { padding: 30px 22px; }
+    .search-form input { width: 88px; }
   }
 </style>
 </head>
@@ -864,6 +971,10 @@
     <li><a href="#reviews">顾客评价</a></li>
     <li><a href="#booking">预订桌位</a></li>
   </ul>
+  <form class="search-form" id="searchForm">
+    <input type="text" id="searchInput" placeholder="搜索菜名或人物..." autocomplete="off">
+    <button type="submit" title="搜索">🔍</button>
+  </form>
   <button class="cart-btn" id="cartBtn" title="购物车">🛒
     <span class="cart-badge" id="cartBadge">0</span>
   </button>
@@ -1225,6 +1336,15 @@
 <!-- ================= 浮动元素 ================= -->
 <button class="to-top" id="toTop" title="回到顶部">↑</button>
 <div class="toast" id="toast"></div>
+<!-- ================= 搜索结果弹窗 ================= -->
+<div class="chef-modal" id="searchModal">
+  <div class="chef-modal-box">
+    <button class="chef-close" id="searchClose">✕</button>
+    <img class="found-photo" id="foundPhoto" src="yaomengtong.jpg" alt="">
+    <p class="found-text">你好,你找到我啦~</p>
+  </div>
+</div>
+
 <!-- ================= 主厨生平弹窗 ================= -->
 <div class="chef-modal" id="chefModal">
   <div class="chef-modal-box">
@@ -1239,6 +1359,11 @@
     <div class="chef-dates">1960年3月12日 — 2005年11月8日</div>
     <p class="chef-bio">王秀华,江苏扬州人,国家特级厨师。16 岁拜师学艺,25 岁主理后厨,1992 年斩获全国烹饪大赛金奖,一生创制菜品两百余道。2005 年 11 月 8 日,因长年操劳突发疾病离世,享年 45 岁。</p>
   </div>
+</div>
+
+<!-- ================= 隐藏反转界面(彩蛋) ================= -->
+<div id="hiddenOverlay">
+  <button id="exitHiddenBtn" title="退出隐藏界面">🚪 退出隐藏界面</button>
 </div>
 
 <div id="loveOverlay">
@@ -1336,6 +1461,88 @@
   toTop.addEventListener('click', () => {
     window.scrollTo({ top: 0, behavior: 'smooth' });
   });
+
+  /* ---------- 搜索 ---------- */
+  const searchForm = document.getElementById('searchForm');
+  const searchInput = document.getElementById('searchInput');
+  const searchModal = document.getElementById('searchModal');
+  const foundPhoto = document.getElementById('foundPhoto');
+  // 可搜索的人物名单
+  const persons = [
+    { name: '张雅雯', img: 'zhangyawen.jpg' },
+    { name: '李梓毓', img: 'liziyu.jpg' },
+    { name: '姚孟彤', img: 'yaomengtong.jpg' }
+  ];
+
+  // ---------- 彩蛋:集齐三个名字解锁隐藏反转界面 ----------
+  const hiddenOverlay = document.getElementById('hiddenOverlay');
+  const exitHiddenBtn = document.getElementById('exitHiddenBtn');
+  let foundNames = new Set(JSON.parse(localStorage.getItem('foundPersons') || '[]'));
+  if (localStorage.getItem('hiddenMode') === '1' && foundNames.size >= 3) {
+    hiddenOverlay.classList.add('show');
+  }
+
+  function unlockHidden() {
+    if (localStorage.getItem('hiddenMode') === '1') return;
+    hiddenOverlay.classList.add('show');
+    localStorage.setItem('hiddenMode', '1');
+    showToast('🎉 彩蛋解锁!集齐三个名字,隐藏反转界面开启!');
+  }
+  exitHiddenBtn.addEventListener('click', () => {
+    hiddenOverlay.classList.remove('show');
+    localStorage.setItem('hiddenMode', '0');
+  });
+
+  searchForm.addEventListener('submit', e => {
+    e.preventDefault();
+    const q = searchInput.value.trim();
+    if (!q) return;
+    const hit = persons.find(p => q.replace(/\s/g, '').includes(p.name));
+    if (hit) {
+      foundPhoto.src = hit.img;
+      foundPhoto.alt = hit.name;
+      searchModal.classList.add('show');
+      startCrazy();
+      searchInput.value = '';
+      // 彩蛋进度:记录找到的人,集齐三人解锁
+      foundNames.add(hit.name);
+      localStorage.setItem('foundPersons', JSON.stringify([...foundNames]));
+      if (foundNames.size >= 3) unlockHidden();
+    } else {
+      showToast('🔍 没有搜到「' + q + '」,提示:试试搜索"张雅雯 / 李梓毓 / 姚孟彤"');
+    }
+  });
+  document.getElementById('searchClose').addEventListener('click', () => {
+    searchModal.classList.remove('show');
+    stopCrazy();
+  });
+  searchModal.addEventListener('click', e => {
+    if (e.target === searchModal) {
+      searchModal.classList.remove('show');
+      stopCrazy();
+    }
+  });
+
+  // 弹窗抖动 + 满屏乱跑
+  let crazyTimer = null;
+  function startCrazy() {
+    const box = searchModal.querySelector('.chef-modal-box');
+    searchModal.classList.add('crazy');
+    const move = () => {
+      const bw = box.offsetWidth, bh = box.offsetHeight;
+      const maxX = Math.max(0, window.innerWidth - bw - 20);
+      const maxY = Math.max(0, window.innerHeight - bh - 20);
+      box.style.left = (10 + Math.random() * maxX) + 'px';
+      box.style.top = (10 + Math.random() * maxY) + 'px';
+      box.style.setProperty('--rot', (Math.random() * 26 - 13).toFixed(1) + 'deg');
+    };
+    move();
+    crazyTimer = setInterval(move, 450);
+  }
+  function stopCrazy() {
+    clearInterval(crazyTimer);
+    searchModal.classList.remove('crazy');
+  }
 
   /* ---------- 主厨生平弹窗 + 眼珠跟随鼠标 ---------- */
   const chefModal = document.getElementById('chefModal');
