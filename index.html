@@ -1,0 +1,1100 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>食光小馆 - 人间烟火气,最抚凡人心</title>
+<style>
+  :root {
+    --primary: #ff6b35;
+    --primary-dark: #e8590c;
+    --accent: #ffb26b;
+    --cream: #fffaf3;
+    --card: #ffffff;
+    --dark: #2b2520;
+    --text: #5c534a;
+    --text-light: #8f857a;
+    --radius: 18px;
+    --shadow: 0 8px 24px rgba(43, 37, 32, .08);
+    --shadow-hover: 0 16px 40px rgba(43, 37, 32, .16);
+  }
+
+  * { margin: 0; padding: 0; box-sizing: border-box; }
+
+  html { scroll-behavior: smooth; }
+
+  body {
+    font-family: "PingFang SC", "Hiragino Sans GB", "Microsoft YaHei", "Noto Sans SC", sans-serif;
+    background: var(--cream);
+    color: var(--text);
+    line-height: 1.6;
+    overflow-x: hidden;
+  }
+
+  /* ============ 导航栏 ============ */
+  .navbar {
+    position: fixed;
+    top: 0; left: 0; right: 0;
+    z-index: 100;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding: 14px 6%;
+    transition: all .3s ease;
+  }
+  .navbar.scrolled {
+    background: rgba(255, 250, 243, .92);
+    backdrop-filter: blur(12px);
+    box-shadow: 0 4px 20px rgba(43, 37, 32, .08);
+    padding: 10px 6%;
+  }
+  .logo {
+    font-size: 1.5rem;
+    font-weight: 800;
+    color: var(--dark);
+    text-decoration: none;
+    display: flex;
+    align-items: center;
+    gap: 8px;
+  }
+  .logo span { color: var(--primary); }
+  .nav-links {
+    display: flex;
+    gap: 34px;
+    list-style: none;
+    align-items: center;
+  }
+  .nav-links a {
+    text-decoration: none;
+    color: var(--dark);
+    font-weight: 600;
+    font-size: .98rem;
+    position: relative;
+    transition: color .25s;
+  }
+  .nav-links a::after {
+    content: "";
+    position: absolute;
+    left: 0; bottom: -6px;
+    width: 0; height: 3px;
+    border-radius: 3px;
+    background: var(--primary);
+    transition: width .3s ease;
+  }
+  .nav-links a:hover { color: var(--primary); }
+  .nav-links a:hover::after { width: 100%; }
+
+  .cart-btn {
+    position: relative;
+    background: var(--primary);
+    color: #fff;
+    border: none;
+    width: 46px; height: 46px;
+    border-radius: 50%;
+    font-size: 1.2rem;
+    cursor: pointer;
+    transition: transform .2s, background .2s;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+  }
+  .cart-btn:hover { background: var(--primary-dark); transform: scale(1.08); }
+  .cart-badge {
+    position: absolute;
+    top: -4px; right: -4px;
+    background: #e03131;
+    color: #fff;
+    font-size: .72rem;
+    font-weight: 700;
+    min-width: 20px; height: 20px;
+    border-radius: 10px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    padding: 0 5px;
+    transform: scale(0);
+    transition: transform .3s cubic-bezier(.68, -.55, .27, 1.55);
+  }
+  .cart-badge.show { transform: scale(1); }
+
+  .hamburger {
+    display: none;
+    background: none;
+    border: none;
+    font-size: 1.6rem;
+    cursor: pointer;
+    color: var(--dark);
+  }
+
+  /* ============ Hero ============ */
+  .hero {
+    min-height: 100vh;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 40px;
+    padding: 140px 8% 80px;
+    background: linear-gradient(160deg, #fff3e6 0%, #ffe3c9 45%, #ffd9b8 100%);
+    position: relative;
+    overflow: hidden;
+  }
+  .hero::before {
+    content: "";
+    position: absolute;
+    width: 600px; height: 600px;
+    border-radius: 50%;
+    background: radial-gradient(circle, rgba(255,107,53,.14), transparent 70%);
+    top: -200px; right: -150px;
+  }
+  .hero-text { flex: 1; max-width: 560px; position: relative; z-index: 2; }
+  .hero-badge {
+    display: inline-flex;
+    align-items: center;
+    gap: 8px;
+    background: #fff;
+    border-radius: 30px;
+    padding: 8px 18px;
+    font-size: .9rem;
+    font-weight: 700;
+    color: var(--primary-dark);
+    box-shadow: var(--shadow);
+    margin-bottom: 24px;
+  }
+  .hero-text h1 {
+    font-size: clamp(2.4rem, 5vw, 3.8rem);
+    color: var(--dark);
+    line-height: 1.2;
+    margin-bottom: 20px;
+    font-weight: 900;
+  }
+  .hero-text h1 em {
+    font-style: normal;
+    color: var(--primary);
+  }
+  .hero-text p {
+    font-size: 1.1rem;
+    color: var(--text);
+    margin-bottom: 34px;
+  }
+  .hero-btns { display: flex; gap: 18px; flex-wrap: wrap; }
+  .btn {
+    display: inline-flex;
+    align-items: center;
+    gap: 8px;
+    padding: 14px 32px;
+    border-radius: 40px;
+    font-size: 1rem;
+    font-weight: 700;
+    text-decoration: none;
+    cursor: pointer;
+    border: none;
+    transition: all .25s ease;
+  }
+  .btn-primary {
+    background: linear-gradient(135deg, var(--primary), var(--primary-dark));
+    color: #fff;
+    box-shadow: 0 8px 24px rgba(255, 107, 53, .4);
+  }
+  .btn-primary:hover { transform: translateY(-3px); box-shadow: 0 12px 30px rgba(255, 107, 53, .5); }
+  .btn-ghost {
+    background: #fff;
+    color: var(--dark);
+    border: 2px solid #f0e2d2;
+  }
+  .btn-ghost:hover { border-color: var(--primary); color: var(--primary); transform: translateY(-3px); }
+
+  .hero-visual {
+    position: relative;
+    width: 420px; height: 420px;
+    flex-shrink: 0;
+    z-index: 2;
+  }
+  .hero-main {
+    position: absolute;
+    inset: 60px;
+    background: #fff;
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 8rem;
+    box-shadow: 0 30px 60px rgba(232, 89, 12, .25);
+    animation: float 5s ease-in-out infinite;
+  }
+  .hero-float {
+    position: absolute;
+    width: 96px; height: 96px;
+    background: #fff;
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 2.6rem;
+    box-shadow: var(--shadow-hover);
+  }
+  .f1 { top: 10px; left: 10px; animation: float 4s ease-in-out infinite .5s; }
+  .f2 { top: 30px; right: 0; animation: float 4.6s ease-in-out infinite 1s; }
+  .f3 { bottom: 20px; left: 30px; animation: float 5.4s ease-in-out infinite 1.5s; }
+  .f4 { bottom: 60px; right: 10px; animation: float 4.4s ease-in-out infinite .8s; }
+
+  @keyframes float {
+    0%, 100% { transform: translateY(0); }
+    50% { transform: translateY(-16px); }
+  }
+
+  .wave-divider { display: block; width: 100%; margin-top: -2px; }
+  .wave-divider path { fill: var(--cream); }
+
+  /* ============ 通用区块 ============ */
+  .section { padding: 90px 6%; }
+  .section-head { text-align: center; margin-bottom: 54px; }
+  .section-head .eyebrow {
+    color: var(--primary);
+    font-weight: 700;
+    letter-spacing: 4px;
+    font-size: .9rem;
+    text-transform: uppercase;
+  }
+  .section-head h2 {
+    font-size: clamp(1.8rem, 3.5vw, 2.6rem);
+    color: var(--dark);
+    font-weight: 900;
+    margin: 10px 0 14px;
+  }
+  .section-head .line {
+    width: 70px; height: 4px;
+    background: linear-gradient(90deg, var(--primary), var(--accent));
+    border-radius: 4px;
+    margin: 0 auto;
+  }
+
+  /* ============ 分类标签 ============ */
+  .tabs {
+    display: flex;
+    justify-content: center;
+    gap: 14px;
+    flex-wrap: wrap;
+    margin-bottom: 44px;
+  }
+  .tab {
+    padding: 10px 26px;
+    border-radius: 30px;
+    border: 2px solid #f0e2d2;
+    background: #fff;
+    font-size: .95rem;
+    font-weight: 700;
+    color: var(--text);
+    cursor: pointer;
+    transition: all .25s ease;
+  }
+  .tab:hover { border-color: var(--accent); color: var(--primary); }
+  .tab.active {
+    background: linear-gradient(135deg, var(--primary), var(--primary-dark));
+    color: #fff;
+    border-color: transparent;
+    box-shadow: 0 6px 18px rgba(255, 107, 53, .35);
+  }
+
+  /* ============ 菜品卡片 ============ */
+  .dishes-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(260px, 1fr));
+    gap: 28px;
+    max-width: 1200px;
+    margin: 0 auto;
+  }
+  .dish-card {
+    background: var(--card);
+    border-radius: var(--radius);
+    overflow: hidden;
+    box-shadow: var(--shadow);
+    transition: transform .3s ease, box-shadow .3s ease;
+    animation: fadeUp .5s ease both;
+  }
+  .dish-card:hover { transform: translateY(-10px); box-shadow: var(--shadow-hover); }
+  .dish-img {
+    height: 170px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 4.6rem;
+    position: relative;
+  }
+  .dish-card:nth-child(6n+1) .dish-img { background: linear-gradient(135deg, #ffe8d9, #ffd0ae); }
+  .dish-card:nth-child(6n+2) .dish-img { background: linear-gradient(135deg, #e3f6e3, #c8ecc8); }
+  .dish-card:nth-child(6n+3) .dish-img { background: linear-gradient(135deg, #e3ecff, #c8d8ff); }
+  .dish-card:nth-child(6n+4) .dish-img { background: linear-gradient(135deg, #fff3d9, #ffe3a3); }
+  .dish-card:nth-child(6n+5) .dish-img { background: linear-gradient(135deg, #fbe3ee, #f8c9dd); }
+  .dish-card:nth-child(6n+6) .dish-img { background: linear-gradient(135deg, #e6f4f8, #c3e3ec); }
+  .dish-tag {
+    position: absolute;
+    top: 14px; left: 14px;
+    background: rgba(255, 255, 255, .9);
+    padding: 4px 12px;
+    border-radius: 20px;
+    font-size: .78rem;
+    font-weight: 700;
+    color: var(--primary-dark);
+  }
+  .dish-body { padding: 20px 22px 24px; }
+  .dish-body h3 { color: var(--dark); font-size: 1.15rem; margin-bottom: 6px; }
+  .dish-body .desc {
+    font-size: .88rem;
+    color: var(--text-light);
+    margin-bottom: 16px;
+    min-height: 42px;
+  }
+  .dish-footer {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+  }
+  .price { color: var(--primary-dark); font-weight: 900; font-size: 1.25rem; }
+  .price small { font-size: .8rem; font-weight: 700; }
+  .add-btn {
+    background: #fff3ea;
+    border: none;
+    color: var(--primary);
+    width: 40px; height: 40px;
+    border-radius: 50%;
+    font-size: 1.25rem;
+    font-weight: 700;
+    cursor: pointer;
+    transition: all .25s;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+  }
+  .add-btn:hover { background: var(--primary); color: #fff; transform: rotate(90deg); }
+
+  /* ============ 特色亮点 ============ */
+  .features {
+    background: linear-gradient(135deg, #2b2520, #43392f);
+    color: #fff;
+  }
+  .features .section-head h2 { color: #fff; }
+  .features-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(230px, 1fr));
+    gap: 28px;
+    max-width: 1100px;
+    margin: 0 auto;
+  }
+  .feature-card {
+    text-align: center;
+    padding: 34px 24px;
+    background: rgba(255, 255, 255, .06);
+    border: 1px solid rgba(255, 255, 255, .1);
+    border-radius: var(--radius);
+    transition: all .3s;
+  }
+  .feature-card:hover {
+    background: rgba(255, 255, 255, .1);
+    transform: translateY(-8px);
+    border-color: rgba(255, 178, 107, .5);
+  }
+  .feature-card .icon {
+    font-size: 2.8rem;
+    margin-bottom: 16px;
+    display: block;
+  }
+  .feature-card h3 { font-size: 1.1rem; margin-bottom: 8px; }
+  .feature-card p { font-size: .88rem; color: #cfc5b8; }
+
+  /* ============ 数据统计 ============ */
+  .stats {
+    display: flex;
+    justify-content: center;
+    gap: 60px;
+    flex-wrap: wrap;
+    background: #fff;
+    padding: 50px 6%;
+    box-shadow: var(--shadow);
+  }
+  .stat { text-align: center; }
+  .stat .num {
+    font-size: 2.6rem;
+    font-weight: 900;
+    color: var(--primary);
+    display: block;
+  }
+  .stat .label { color: var(--text-light); font-size: .92rem; }
+
+  /* ============ 顾客评价 ============ */
+  .reviews-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+    gap: 28px;
+    max-width: 1100px;
+    margin: 0 auto;
+  }
+  .review-card {
+    background: #fff;
+    border-radius: var(--radius);
+    padding: 30px 26px;
+    box-shadow: var(--shadow);
+    position: relative;
+    transition: transform .3s;
+  }
+  .review-card:hover { transform: translateY(-8px); }
+  .review-card::before {
+    content: "“";
+    position: absolute;
+    top: 4px; right: 22px;
+    font-size: 5rem;
+    color: #fde8da;
+    font-family: Georgia, serif;
+    line-height: 1;
+  }
+  .stars { color: #ffb400; letter-spacing: 3px; margin-bottom: 14px; }
+  .review-card p { font-size: .95rem; margin-bottom: 20px; position: relative; }
+  .reviewer { display: flex; align-items: center; gap: 12px; }
+  .avatar {
+    width: 46px; height: 46px;
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 1.4rem;
+    background: #fff0e5;
+  }
+  .reviewer .name { font-weight: 800; color: var(--dark); font-size: .95rem; }
+  .reviewer .role { font-size: .8rem; color: var(--text-light); }
+
+  /* ============ 预订表单 ============ */
+  .booking {
+    background: linear-gradient(160deg, #fff3e6, #ffe3c9);
+  }
+  .booking-box {
+    max-width: 640px;
+    margin: 0 auto;
+    background: #fff;
+    border-radius: 24px;
+    padding: 46px;
+    box-shadow: var(--shadow-hover);
+  }
+  .form-row {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 20px;
+  }
+  .form-group { margin-bottom: 20px; }
+  .form-group label {
+    display: block;
+    font-weight: 700;
+    color: var(--dark);
+    font-size: .92rem;
+    margin-bottom: 8px;
+  }
+  .form-group input {
+    width: 100%;
+    padding: 13px 16px;
+    border: 2px solid #f0e2d2;
+    border-radius: 12px;
+    font-size: .95rem;
+    font-family: inherit;
+    color: var(--dark);
+    background: var(--cream);
+    transition: border-color .25s;
+    outline: none;
+  }
+  .form-group input:focus { border-color: var(--primary); background: #fff; }
+  .booking-box .btn { width: 100%; justify-content: center; margin-top: 8px; }
+
+  /* ============ 页脚 ============ */
+  footer {
+    background: #241f1b;
+    color: #b8ada0;
+    padding: 60px 6% 30px;
+  }
+  .footer-grid {
+    display: grid;
+    grid-template-columns: 2fr 1fr 1fr;
+    gap: 40px;
+    max-width: 1100px;
+    margin: 0 auto 40px;
+  }
+  .footer-grid h4 { color: #fff; margin-bottom: 16px; font-size: 1.05rem; }
+  .footer-about .logo { color: #fff; margin-bottom: 14px; }
+  .footer-about p { font-size: .9rem; max-width: 320px; }
+  .footer-grid ul { list-style: none; }
+  .footer-grid ul li { margin-bottom: 10px; font-size: .9rem; }
+  .footer-grid ul a { color: #b8ada0; text-decoration: none; transition: color .25s; }
+  .footer-grid ul a:hover { color: var(--accent); }
+  .socials { display: flex; gap: 12px; margin-top: 18px; }
+  .socials a {
+    width: 40px; height: 40px;
+    border-radius: 50%;
+    background: rgba(255, 255, 255, .08);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 1.1rem;
+    text-decoration: none;
+    transition: all .25s;
+  }
+  .socials a:hover { background: var(--primary); transform: translateY(-4px); }
+  .copyright {
+    text-align: center;
+    padding-top: 26px;
+    border-top: 1px solid rgba(255, 255, 255, .08);
+    font-size: .85rem;
+  }
+
+  /* ============ 浮动元素 ============ */
+  .to-top {
+    position: fixed;
+    bottom: 30px; right: 30px;
+    width: 50px; height: 50px;
+    border-radius: 50%;
+    background: linear-gradient(135deg, var(--primary), var(--primary-dark));
+    color: #fff;
+    font-size: 1.3rem;
+    border: none;
+    cursor: pointer;
+    box-shadow: 0 8px 22px rgba(255, 107, 53, .45);
+    opacity: 0;
+    pointer-events: none;
+    transform: translateY(16px);
+    transition: all .3s;
+    z-index: 99;
+  }
+  .to-top.show { opacity: 1; pointer-events: auto; transform: translateY(0); }
+  .to-top:hover { transform: translateY(-4px); }
+
+  .toast {
+    position: fixed;
+    top: 90px; left: 50%;
+    transform: translateX(-50%) translateY(-30px);
+    background: var(--dark);
+    color: #fff;
+    padding: 13px 28px;
+    border-radius: 40px;
+    font-size: .92rem;
+    font-weight: 600;
+    opacity: 0;
+    pointer-events: none;
+    transition: all .35s cubic-bezier(.68, -.55, .27, 1.55);
+    z-index: 200;
+    box-shadow: 0 10px 30px rgba(0, 0, 0, .3);
+    white-space: nowrap;
+  }
+  .toast.show { opacity: 1; transform: translateX(-50%) translateY(0); }
+
+  /* ============ 滚动动画 ============ */
+  .reveal {
+    opacity: 0;
+    transform: translateY(36px);
+    transition: opacity .7s ease, transform .7s ease;
+  }
+  .reveal.visible { opacity: 1; transform: translateY(0); }
+
+  @keyframes fadeUp {
+    from { opacity: 0; transform: translateY(24px); }
+    to { opacity: 1; transform: translateY(0); }
+  }
+
+  /* ============ 响应式 ============ */
+  @media (max-width: 900px) {
+    .hero { flex-direction: column; text-align: center; padding-top: 120px; }
+    .hero-visual { width: 300px; height: 300px; }
+    .hero-main { inset: 40px; font-size: 5.6rem; }
+    .hero-float { width: 72px; height: 72px; font-size: 2rem; }
+    .nav-links {
+      position: fixed;
+      top: 0; right: -100%;
+      width: 70%; height: 100vh;
+      background: #fff;
+      flex-direction: column;
+      padding: 90px 40px;
+      gap: 28px;
+      box-shadow: -10px 0 40px rgba(0, 0, 0, .15);
+      transition: right .35s ease;
+      align-items: flex-start;
+    }
+    .nav-links.open { right: 0; }
+    .hamburger { display: block; z-index: 101; }
+    .form-row { grid-template-columns: 1fr; }
+    .footer-grid { grid-template-columns: 1fr; }
+    .booking-box { padding: 30px 22px; }
+  }
+</style>
+</head>
+<body>
+
+<!-- ================= 导航栏 ================= -->
+<nav class="navbar" id="navbar">
+  <a href="#home" class="logo">🍽️ 食光<span>小馆</span></a>
+  <ul class="nav-links" id="navLinks">
+    <li><a href="#home">首页</a></li>
+    <li><a href="#dishes">招牌菜</a></li>
+    <li><a href="#features">我们的故事</a></li>
+    <li><a href="#reviews">顾客评价</a></li>
+    <li><a href="#booking">预订桌位</a></li>
+  </ul>
+  <button class="cart-btn" id="cartBtn" title="购物车">🛒
+    <span class="cart-badge" id="cartBadge">0</span>
+  </button>
+  <button class="hamburger" id="hamburger">☰</button>
+</nav>
+
+<!-- ================= Hero ================= -->
+<section class="hero" id="home">
+  <div class="hero-text">
+    <div class="hero-badge">🔥 开业 12 年 · 老饕认证</div>
+    <h1>人间烟火气<br>最抚<em>凡人心</em></h1>
+    <p>精选当季食材,传承地道手艺。每一道菜,都是一段被认真对待的时光。食光小馆,等你来品尝。</p>
+    <div class="hero-btns">
+      <a href="#dishes" class="btn btn-primary">🍜 立即点餐</a>
+      <a href="#booking" class="btn btn-ghost">📅 预订桌位</a>
+    </div>
+  </div>
+  <div class="hero-visual">
+    <div class="hero-main">🍜</div>
+    <div class="hero-float f1">🥟</div>
+    <div class="hero-float f2">🍤</div>
+    <div class="hero-float f3">🌶️</div>
+    <div class="hero-float f4">🍰</div>
+  </div>
+</section>
+
+<svg class="wave-divider" viewBox="0 0 1440 90" preserveAspectRatio="none" height="90">
+  <path d="M0,40 C240,90 480,0 720,40 C960,80 1200,10 1440,50 L1440,90 L0,90 Z"></path>
+</svg>
+
+<!-- ================= 招牌菜 ================= -->
+<section class="section" id="dishes">
+  <div class="section-head reveal">
+    <div class="eyebrow">OUR MENU</div>
+    <h2>🔥 招牌菜品</h2>
+    <div class="line"></div>
+  </div>
+
+  <div class="tabs reveal" id="tabs">
+    <button class="tab active" data-category="all">全部</button>
+    <button class="tab" data-category="hot">🍲 招牌热菜</button>
+    <button class="tab" data-category="staple">🍜 面点主食</button>
+    <button class="tab" data-category="dessert">🍰 甜品饮品</button>
+    <button class="tab" data-category="snack">🍢 特色小吃</button>
+  </div>
+
+  <div class="dishes-grid" id="dishesGrid">
+    <div class="dish-card" data-category="hot">
+      <div class="dish-img">🦞<span class="dish-tag">人气 TOP1</span></div>
+      <div class="dish-body">
+        <h3>麻辣小龙虾</h3>
+        <p class="desc">秘制十三香,虾肉Q弹紧实,麻辣过瘾</p>
+        <div class="dish-footer">
+          <span class="price"><small>¥</small>88</span>
+          <button class="add-btn" data-name="麻辣小龙虾">+</button>
+        </div>
+      </div>
+    </div>
+
+    <div class="dish-card" data-category="hot">
+      <div class="dish-img">🐟<span class="dish-tag">招牌必点</span></div>
+      <div class="dish-body">
+        <h3>老坛酸菜鱼</h3>
+        <p class="desc">鲜嫩黑鱼片,搭配自制老坛酸菜,酸爽开胃</p>
+        <div class="dish-footer">
+          <span class="price"><small>¥</small>68</span>
+          <button class="add-btn" data-name="老坛酸菜鱼">+</button>
+        </div>
+      </div>
+    </div>
+
+    <div class="dish-card" data-category="hot">
+      <div class="dish-img">🍖<span class="dish-tag">东坡传承</span></div>
+      <div class="dish-body">
+        <h3>东坡肉</h3>
+        <p class="desc">肥而不腻,入口即化,配荷叶饼一绝</p>
+        <div class="dish-footer">
+          <span class="price"><small>¥</small>58</span>
+          <button class="add-btn" data-name="东坡肉">+</button>
+        </div>
+      </div>
+    </div>
+
+    <div class="dish-card" data-category="hot">
+      <div class="dish-img">🌶️<span class="dish-tag">无辣不欢</span></div>
+      <div class="dish-body">
+        <h3>麻婆豆腐</h3>
+        <p class="desc">麻辣鲜香烫,嫩豆腐配牛肉末,下饭神器</p>
+        <div class="dish-footer">
+          <span class="price"><small>¥</small>32</span>
+          <button class="add-btn" data-name="麻婆豆腐">+</button>
+        </div>
+      </div>
+    </div>
+
+    <div class="dish-card" data-category="staple">
+      <div class="dish-img">🍜<span class="dish-tag">手工现拉</span></div>
+      <div class="dish-body">
+        <h3>兰州牛肉拉面</h3>
+        <p class="desc">一清二白三红四绿,汤鲜面劲道</p>
+        <div class="dish-footer">
+          <span class="price"><small>¥</small>28</span>
+          <button class="add-btn" data-name="兰州牛肉拉面">+</button>
+        </div>
+      </div>
+    </div>
+
+    <div class="dish-card" data-category="staple">
+      <div class="dish-img">🥟<span class="dish-tag">每日现包</span></div>
+      <div class="dish-body">
+        <h3>手工三鲜水饺</h3>
+        <p class="desc">虾仁猪肉韭菜,皮薄馅大,一口爆汁</p>
+        <div class="dish-footer">
+          <span class="price"><small>¥</small>22</span>
+          <button class="add-btn" data-name="手工三鲜水饺">+</button>
+        </div>
+      </div>
+    </div>
+
+    <div class="dish-card" data-category="staple">
+      <div class="dish-img">🍚<span class="dish-tag">粒粒分明</span></div>
+      <div class="dish-body">
+        <h3>扬州炒饭</h3>
+        <p class="desc">虾仁火腿青豆,锅气十足,粒粒金黄</p>
+        <div class="dish-footer">
+          <span class="price"><small>¥</small>26</span>
+          <button class="add-btn" data-name="扬州炒饭">+</button>
+        </div>
+      </div>
+    </div>
+
+    <div class="dish-card" data-category="dessert">
+      <div class="dish-img">🍰<span class="dish-tag">甜品招牌</span></div>
+      <div class="dish-body">
+        <h3>经典提拉米苏</h3>
+        <p class="desc">马斯卡彭芝士,咖啡酒香,绵密丝滑</p>
+        <div class="dish-footer">
+          <span class="price"><small>¥</small>32</span>
+          <button class="add-btn" data-name="经典提拉米苏">+</button>
+        </div>
+      </div>
+    </div>
+
+    <div class="dish-card" data-category="dessert">
+      <div class="dish-img">🧋<span class="dish-tag">手摇现做</span></div>
+      <div class="dish-body">
+        <h3>黑糖珍珠奶茶</h3>
+        <p class="desc">现熬黑糖珍珠,Q弹有嚼劲,奶香浓郁</p>
+        <div class="dish-footer">
+          <span class="price"><small>¥</small>15</span>
+          <button class="add-btn" data-name="黑糖珍珠奶茶">+</button>
+        </div>
+      </div>
+    </div>
+
+    <div class="dish-card" data-category="dessert">
+      <div class="dish-img">🥭<span class="dish-tag">当季限定</span></div>
+      <div class="dish-body">
+        <h3>芒果绵绵冰</h3>
+        <p class="desc">大块台农芒果,牛奶冰底,清爽解腻</p>
+        <div class="dish-footer">
+          <span class="price"><small>¥</small>18</span>
+          <button class="add-btn" data-name="芒果绵绵冰">+</button>
+        </div>
+      </div>
+    </div>
+
+    <div class="dish-card" data-category="snack">
+      <div class="dish-img">🍢<span class="dish-tag">深夜食堂</span></div>
+      <div class="dish-body">
+        <h3>炭火烤串拼盘</h3>
+        <p class="desc">牛肉羊肉鸡翅,孜然辣椒,炭香十足</p>
+        <div class="dish-footer">
+          <span class="price"><small>¥</small>20</span>
+          <button class="add-btn" data-name="炭火烤串拼盘">+</button>
+        </div>
+      </div>
+    </div>
+
+    <div class="dish-card" data-category="snack">
+      <div class="dish-img">🐙<span class="dish-tag">网红同款</span></div>
+      <div class="dish-body">
+        <h3>章鱼小丸子</h3>
+        <p class="desc">整粒章鱼足,木鱼花跳舞,外脆里嫩</p>
+        <div class="dish-footer">
+          <span class="price"><small>¥</small>18</span>
+          <button class="add-btn" data-name="章鱼小丸子">+</button>
+        </div>
+      </div>
+    </div>
+
+    <div class="dish-card" data-category="snack">
+      <div class="dish-img">🍗<span class="dish-tag">外酥里嫩</span></div>
+      <div class="dish-body">
+        <h3>秘制香酥炸鸡</h3>
+        <p class="desc">腌制 12 小时,脆皮锁汁,配甜辣酱</p>
+        <div class="dish-footer">
+          <span class="price"><small>¥</small>28</span>
+          <button class="add-btn" data-name="秘制香酥炸鸡">+</button>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ================= 数据统计 ================= -->
+<div class="stats">
+  <div class="stat"><span class="num">12</span><span class="label">年匠心经营</span></div>
+  <div class="stat"><span class="num">200+</span><span class="label">道精选菜品</span></div>
+  <div class="stat"><span class="num">98%</span><span class="label">顾客好评率</span></div>
+  <div class="stat"><span class="num">50万+</span><span class="label">食客到访</span></div>
+</div>
+
+<!-- ================= 特色亮点 ================= -->
+<section class="section features" id="features">
+  <div class="section-head reveal">
+    <div class="eyebrow" style="color:#ffb26b;">WHY CHOOSE US</div>
+    <h2>为什么选择食光小馆</h2>
+    <div class="line"></div>
+  </div>
+  <div class="features-grid">
+    <div class="feature-card reveal">
+      <span class="icon">🌾</span>
+      <h3>新鲜食材</h3>
+      <p>每日清晨直采当季食材,从农场到餐桌不超过 24 小时</p>
+    </div>
+    <div class="feature-card reveal">
+      <span class="icon">👨‍🍳</span>
+      <h3>名厨掌勺</h3>
+      <p>主厨从业 25 年,曾获全国烹饪大赛金奖,坚持手工现做</p>
+    </div>
+    <div class="feature-card reveal">
+      <span class="icon">🫖</span>
+      <h3>地道风味</h3>
+      <p>传承三代的秘制配方,还原记忆中最正宗的家乡味道</p>
+    </div>
+    <div class="feature-card reveal">
+      <span class="icon">💝</span>
+      <h3>贴心服务</h3>
+      <p>从进门到离店,每一个细节都被温柔以待</p>
+    </div>
+  </div>
+</section>
+
+<!-- ================= 顾客评价 ================= -->
+<section class="section" id="reviews">
+  <div class="section-head reveal">
+    <div class="eyebrow">REVIEWS</div>
+    <h2>💬 食客怎么说</h2>
+    <div class="line"></div>
+  </div>
+  <div class="reviews-grid">
+    <div class="review-card reveal">
+      <div class="stars">★★★★★</div>
+      <p>小龙虾个头超大,汤汁拌面简直绝了!环境也很温馨,像回到家里吃饭一样,已经推荐给全公司同事了!</p>
+      <div class="reviewer">
+        <div class="avatar">👩</div>
+        <div>
+          <div class="name">林小满</div>
+          <div class="role">美食博主 · 探店 100+ 家</div>
+        </div>
+      </div>
+    </div>
+    <div class="review-card reveal">
+      <div class="stars">★★★★★</div>
+      <p>带爸妈来吃的,酸菜鱼连汤都喝光了。服务员看我妈不能吃辣,主动推荐了几道清淡菜,细节满分。</p>
+      <div class="reviewer">
+        <div class="avatar">👨</div>
+        <div>
+          <div class="name">张建国</div>
+          <div class="role">老顾客 · 光顾 8 年</div>
+        </div>
+      </div>
+    </div>
+    <div class="review-card reveal">
+      <div class="stars">★★★★★</div>
+      <p>提拉米苏是意外惊喜,不输专业甜品店。人均才六十多,性价比之王,姐妹们冲!</p>
+      <div class="reviewer">
+        <div class="avatar">👧</div>
+        <div>
+          <div class="name">桃子酱</div>
+          <div class="role">大学生 · 周末常客</div>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ================= 预订桌位 ================= -->
+<section class="section booking" id="booking">
+  <div class="section-head reveal">
+    <div class="eyebrow">BOOK A TABLE</div>
+    <h2>📅 预订桌位</h2>
+    <div class="line"></div>
+  </div>
+  <div class="booking-box reveal">
+    <form id="bookingForm">
+      <div class="form-row">
+        <div class="form-group">
+          <label for="name">您的称呼</label>
+          <input type="text" id="name" placeholder="如:王先生 / 李女士" required>
+        </div>
+        <div class="form-group">
+          <label for="phone">联系电话</label>
+          <input type="tel" id="phone" placeholder="请输入手机号" required>
+        </div>
+      </div>
+      <div class="form-row">
+        <div class="form-group">
+          <label for="date">到店日期</label>
+          <input type="date" id="date" required>
+        </div>
+        <div class="form-group">
+          <label for="people">用餐人数</label>
+          <input type="number" id="people" min="1" max="30" placeholder="请输入人数" required>
+        </div>
+      </div>
+      <button type="submit" class="btn btn-primary">✅ 提交预订</button>
+    </form>
+  </div>
+</section>
+
+<!-- ================= 页脚 ================= -->
+<footer>
+  <div class="footer-grid">
+    <div class="footer-about">
+      <a href="#home" class="logo">🍽️ 食光<span>小馆</span></a>
+      <p>始于 2014 年,用心做好每一道菜。愿美食与爱,都不被辜负。</p>
+      <div class="socials">
+        <a href="#" title="微信">💬</a>
+        <a href="#" title="微博">📣</a>
+        <a href="#" title="抖音">🎵</a>
+        <a href="#" title="大众点评">⭐</a>
+      </div>
+    </div>
+    <div>
+      <h4>快速导航</h4>
+      <ul>
+        <li><a href="#home">首页</a></li>
+        <li><a href="#dishes">招牌菜</a></li>
+        <li><a href="#features">我们的故事</a></li>
+        <li><a href="#booking">预订桌位</a></li>
+      </ul>
+    </div>
+    <div>
+      <h4>联系我们</h4>
+      <ul>
+        <li>📍 幸福路 88 号食光大厦 1 层</li>
+        <li>📞 0571-8888-6666</li>
+        <li>🕐 10:00 - 22:00(全年无休)</li>
+        <li>📮 hello@shiguang.example.com</li>
+      </ul>
+    </div>
+  </div>
+  <div class="copyright">© 2026 食光小馆 · 用心做好每一道菜 | 本页面为网页设计演示</div>
+</footer>
+
+<!-- ================= 浮动元素 ================= -->
+<button class="to-top" id="toTop" title="回到顶部">↑</button>
+<div class="toast" id="toast"></div>
+
+<script>
+  /* ---------- 导航栏滚动效果 ---------- */
+  const navbar = document.getElementById('navbar');
+  window.addEventListener('scroll', () => {
+    navbar.classList.toggle('scrolled', window.scrollY > 40);
+  });
+
+  /* ---------- 移动端菜单 ---------- */
+  const hamburger = document.getElementById('hamburger');
+  const navLinks = document.getElementById('navLinks');
+  hamburger.addEventListener('click', () => {
+    navLinks.classList.toggle('open');
+    hamburger.textContent = navLinks.classList.contains('open') ? '✕' : '☰';
+  });
+  // 点击导航链接后自动收起菜单
+  navLinks.querySelectorAll('a').forEach(a => {
+    a.addEventListener('click', () => {
+      navLinks.classList.remove('open');
+      hamburger.textContent = '☰';
+    });
+  });
+
+  /* ---------- 分类筛选 ---------- */
+  const tabs = document.querySelectorAll('.tab');
+  const cards = document.querySelectorAll('.dish-card');
+  const grid = document.getElementById('dishesGrid');
+
+  tabs.forEach(tab => {
+    tab.addEventListener('click', () => {
+      tabs.forEach(t => t.classList.remove('active'));
+      tab.classList.add('active');
+      const category = tab.dataset.category;
+      cards.forEach(card => {
+        const show = category === 'all' || card.dataset.category === category;
+        card.style.display = show ? '' : 'none';
+        if (show) {
+          card.style.animation = 'none';
+          void card.offsetWidth; // 强制回流,重新触发动画
+          card.style.animation = 'fadeUp .5s ease both';
+        }
+      });
+    });
+  });
+
+  /* ---------- 购物车 ---------- */
+  let count = 0;
+  const badge = document.getElementById('cartBadge');
+  const toast = document.getElementById('toast');
+  let toastTimer;
+
+  function showToast(msg) {
+    toast.textContent = msg;
+    toast.classList.add('show');
+    clearTimeout(toastTimer);
+    toastTimer = setTimeout(() => toast.classList.remove('show'), 2000);
+  }
+
+  document.querySelectorAll('.add-btn').forEach(btn => {
+    btn.addEventListener('click', () => {
+      count++;
+      badge.textContent = count;
+      badge.classList.add('show');
+      showToast(`✅ 已加入购物车:${btn.dataset.name}(共 ${count} 件)`);
+    });
+  });
+
+  document.getElementById('cartBtn').addEventListener('click', () => {
+    showToast(count > 0 ? `🛒 购物车共有 ${count} 件美食` : '🛒 购物车还是空的,快去挑几道好菜吧~');
+  });
+
+  /* ---------- 滚动显现动画 ---------- */
+  const observer = new IntersectionObserver(entries => {
+    entries.forEach(entry => {
+      if (entry.isIntersecting) {
+        entry.target.classList.add('visible');
+        observer.unobserve(entry.target);
+      }
+    });
+  }, { threshold: 0.12 });
+  document.querySelectorAll('.reveal').forEach(el => observer.observe(el));
+
+  /* ---------- 回到顶部 ---------- */
+  const toTop = document.getElementById('toTop');
+  window.addEventListener('scroll', () => {
+    toTop.classList.toggle('show', window.scrollY > 600);
+  });
+  toTop.addEventListener('click', () => {
+    window.scrollTo({ top: 0, behavior: 'smooth' });
+  });
+
+  /* ---------- 预订表单 ---------- */
+  document.getElementById('bookingForm').addEventListener('submit', e => {
+    e.preventDefault();
+    const name = document.getElementById('name').value.trim();
+    const date = document.getElementById('date').value;
+    const people = document.getElementById('people').value;
+    showToast(`🎉 ${name},已收到您 ${date} ${people} 人的预订,稍后电话确认!`);
+    e.target.reset();
+  });
+
+  /* ---------- 默认日期设为今天 ---------- */
+  document.getElementById('date').valueAsDate = new Date();
+</script>
+</body>
+</html>
