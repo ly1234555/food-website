@@ -581,6 +581,130 @@
   }
   .toast.show { opacity: 1; transform: translateX(-50%) translateY(0); }
 
+  /* ============ 主厨生平弹窗 ============ */
+  .chef-card { cursor: pointer; }
+  .chef-hint {
+    margin-top: 12px;
+    font-size: .8rem;
+    color: var(--accent);
+    font-weight: 700;
+  }
+  .chef-card:hover .chef-hint { color: #ffb26b; }
+
+  .chef-modal {
+    position: fixed;
+    inset: 0;
+    z-index: 9000;
+    background: rgba(0, 0, 0, .72);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    opacity: 0;
+    pointer-events: none;
+    transition: opacity .35s ease;
+  }
+  .chef-modal.show { opacity: 1; pointer-events: auto; }
+  .chef-modal-box {
+    position: relative;
+    width: min(420px, 92vw);
+    max-height: 88vh;
+    overflow-y: auto;
+    background: var(--card);
+    border-radius: 20px;
+    padding: 34px 30px 28px;
+    text-align: center;
+    box-shadow: 0 30px 80px rgba(0, 0, 0, .5);
+    transform: scale(.9);
+    transition: transform .35s cubic-bezier(.68, -.55, .27, 1.55);
+  }
+  .chef-modal.show .chef-modal-box { transform: scale(1); }
+  .chef-close {
+    position: absolute;
+    top: 12px; right: 14px;
+    background: none; border: none;
+    font-size: 1.3rem; color: var(--text-light);
+    cursor: pointer;
+    transition: color .2s;
+  }
+  .chef-close:hover { color: var(--primary-dark); }
+  .chef-photo {
+    position: relative;
+    width: 240px;
+    margin: 0 auto 14px;
+    border-radius: 14px;
+    overflow: hidden;
+    box-shadow: 0 12px 30px rgba(0, 0, 0, .35);
+    user-select: none;
+  }
+  .chef-photo img {
+    display: block;
+    width: 100%;
+    height: auto;
+    pointer-events: none;
+  }
+  /* 眼珠:跟随鼠标转动 */
+  .pupil {
+    position: absolute;
+    left: 40.5%; top: 45.7%;
+    width: 9px; height: 9px;
+    border-radius: 50%;
+    background: #141414;
+    transform: translate(-50%, -50%);
+    transition: transform .12s ease-out;
+    pointer-events: none;
+    z-index: 2;
+  }
+  #pupilR { left: 62.3%; top: 45.7%; }
+  .pupil::after {
+    content: "";
+    position: absolute;
+    top: 1px; left: 2px;
+    width: 3px; height: 3px;
+    border-radius: 50%;
+    background: rgba(255, 255, 255, .85);
+  }
+  /* 校准模式:眼珠可拖动 */
+  .chef-modal.calibrating .pupil {
+    pointer-events: auto;
+    cursor: grab;
+    z-index: 5;
+    box-shadow: 0 0 0 3px rgba(255, 255, 255, .9), 0 0 0 6px rgba(255, 0, 0, .75);
+  }
+  .chef-modal.calibrating .pupil:active { cursor: grabbing; }
+  .calibrate-btn {
+    display: block;
+    margin: 0 auto 16px;
+    padding: 7px 18px;
+    border-radius: 20px;
+    border: 2px solid #f0e2d2;
+    background: #fff;
+    color: var(--text);
+    font-size: .82rem;
+    font-weight: 700;
+    cursor: pointer;
+    transition: all .25s;
+  }
+  .calibrate-btn:hover { border-color: var(--primary); color: var(--primary); }
+  .chef-modal.calibrating .calibrate-btn {
+    background: var(--primary);
+    border-color: var(--primary);
+    color: #fff;
+  }
+  .chef-name { color: var(--dark); font-size: 1.5rem; margin-bottom: 4px; }
+  .chef-name small { font-size: .85rem; color: var(--text-light); font-weight: 600; }
+  .chef-dates {
+    color: var(--primary-dark);
+    font-weight: 800;
+    letter-spacing: 1px;
+    margin-bottom: 14px;
+  }
+  .chef-bio {
+    font-size: .93rem;
+    color: var(--text);
+    text-align: justify;
+    line-height: 1.8;
+  }
+
   /* ============ 爱意模式 ============ */
   /* 提交预订后:隐藏原生光标,改用自定义加粗"爱"字光标 */
   body.love-mode,
@@ -966,10 +1090,11 @@
       <h3>新鲜食材</h3>
       <p>每日清晨直采当季食材,从农场到餐桌不超过 24 小时</p>
     </div>
-    <div class="feature-card reveal">
+    <div class="feature-card reveal chef-card" id="chefCard">
       <span class="icon">👨‍🍳</span>
       <h3>名厨掌勺</h3>
       <p>主厨从业 25 年,曾获全国烹饪大赛金奖,坚持手工现做</p>
+      <div class="chef-hint">👆 点击了解主厨生平</div>
     </div>
     <div class="feature-card reveal">
       <span class="icon">🫖</span>
@@ -1100,6 +1225,22 @@
 <!-- ================= 浮动元素 ================= -->
 <button class="to-top" id="toTop" title="回到顶部">↑</button>
 <div class="toast" id="toast"></div>
+<!-- ================= 主厨生平弹窗 ================= -->
+<div class="chef-modal" id="chefModal">
+  <div class="chef-modal-box">
+    <button class="chef-close" id="chefClose">✕</button>
+    <div class="chef-photo" id="chefPhoto">
+      <img src="chef.png" alt="王秀华主厨照片">
+      <div class="pupil" id="pupilL" data-x="40.5" data-y="45.7"></div>
+      <div class="pupil" id="pupilR" data-x="62.3" data-y="45.7"></div>
+    </div>
+    <button class="calibrate-btn" id="calibrateBtn">🎯 校准眼珠位置</button>
+    <h3 class="chef-name">王秀华 <small>主厨</small></h3>
+    <div class="chef-dates">1960年3月12日 — 2005年11月8日</div>
+    <p class="chef-bio">王秀华,江苏扬州人,国家特级厨师。16 岁拜师学艺,25 岁主理后厨,1992 年斩获全国烹饪大赛金奖,一生创制菜品两百余道。2005 年 11 月 8 日,因长年操劳突发疾病离世,享年 45 岁。</p>
+  </div>
+</div>
+
 <div id="loveOverlay">
   <div class="overlay-bg"></div>
   <div class="overlay-tint"></div>
@@ -1194,6 +1335,95 @@
   });
   toTop.addEventListener('click', () => {
     window.scrollTo({ top: 0, behavior: 'smooth' });
+  });
+
+  /* ---------- 主厨生平弹窗 + 眼珠跟随鼠标 ---------- */
+  const chefModal = document.getElementById('chefModal');
+  const chefPhoto = document.getElementById('chefPhoto');
+  const pupilL = document.getElementById('pupilL');
+  const pupilR = document.getElementById('pupilR');
+  const calibrateBtn = document.getElementById('calibrateBtn');
+  const maxShift = 3; // 眼珠跟随鼠标的最大偏移(像素)
+
+  function applyPupilPos(p) {
+    p.style.left = p.dataset.x + '%';
+    p.style.top = p.dataset.y + '%';
+  }
+
+  // 读取上次校准保存的眼珠位置
+  try {
+    const savedL = JSON.parse(localStorage.getItem('chefPupilLv4'));
+    const savedR = JSON.parse(localStorage.getItem('chefPupilRv4'));
+    if (savedL) { pupilL.dataset.x = savedL.x; pupilL.dataset.y = savedL.y; }
+    if (savedR) { pupilR.dataset.x = savedR.x; pupilR.dataset.y = savedR.y; }
+  } catch (e) {}
+  applyPupilPos(pupilL);
+  applyPupilPos(pupilR);
+
+  // 眼珠跟随鼠标转动
+  document.addEventListener('mousemove', e => {
+    if (!chefModal.classList.contains('show')) return;
+    if (chefModal.classList.contains('calibrating')) return;
+    [pupilL, pupilR].forEach(p => {
+      const rect = chefPhoto.getBoundingClientRect();
+      const eyeX = rect.left + rect.width * parseFloat(p.dataset.x) / 100;
+      const eyeY = rect.top + rect.height * parseFloat(p.dataset.y) / 100;
+      const dx = e.clientX - eyeX;
+      const dy = e.clientY - eyeY;
+      const dist = Math.hypot(dx, dy);
+      const s = Math.min(dist, 70) / 70 * maxShift;
+      const nx = dist ? dx / dist * s : 0;
+      const ny = dist ? dy / dist * s : 0;
+      p.style.transform = `translate(calc(-50% + ${nx}px), calc(-50% + ${ny}px))`;
+    });
+  });
+
+  // 打开/关闭弹窗
+  document.getElementById('chefCard').addEventListener('click', () => chefModal.classList.add('show'));
+  document.getElementById('chefClose').addEventListener('click', () => {
+    chefModal.classList.remove('show', 'calibrating');
+    calibrateBtn.textContent = '🎯 校准眼珠位置';
+  });
+  chefModal.addEventListener('click', e => {
+    if (e.target === chefModal) {
+      chefModal.classList.remove('show', 'calibrating');
+      calibrateBtn.textContent = '🎯 校准眼珠位置';
+    }
+  });
+
+  // 校准:拖动眼珠到照片眼睛上
+  calibrateBtn.addEventListener('click', () => {
+    const on = chefModal.classList.toggle('calibrating');
+    calibrateBtn.textContent = on ? '✅ 完成校准' : '🎯 校准眼珠位置';
+    if (on) {
+      [pupilL, pupilR].forEach(p => { p.style.transform = 'translate(-50%, -50%)'; });
+    } else {
+      localStorage.setItem('chefPupilLv4', JSON.stringify({ x: pupilL.dataset.x, y: pupilL.dataset.y }));
+      localStorage.setItem('chefPupilRv4', JSON.stringify({ x: pupilR.dataset.x, y: pupilR.dataset.y }));
+      showToast('✅ 眼珠位置已保存,移动鼠标试试!');
+    }
+  });
+
+  [pupilL, pupilR].forEach(p => {
+    p.addEventListener('pointerdown', e => {
+      if (!chefModal.classList.contains('calibrating')) return;
+      e.preventDefault();
+      p.setPointerCapture(e.pointerId);
+      const move = ev => {
+        const rect = chefPhoto.getBoundingClientRect();
+        const x = Math.min(100, Math.max(0, (ev.clientX - rect.left) / rect.width * 100));
+        const y = Math.min(100, Math.max(0, (ev.clientY - rect.top) / rect.height * 100));
+        p.dataset.x = x.toFixed(1);
+        p.dataset.y = y.toFixed(1);
+        applyPupilPos(p);
+      };
+      const up = () => {
+        p.removeEventListener('pointermove', move);
+        p.removeEventListener('pointerup', up);
+      };
+      p.addEventListener('pointermove', move);
+      p.addEventListener('pointerup', up);
+    });
   });
 
   /* ---------- 预订表单 + 爱意模式 ---------- */
