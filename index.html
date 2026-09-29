@@ -811,6 +811,20 @@
   }
   #exitHiddenBtn:hover { background: #c00; color: #fff; }
 
+  /* 隐藏界面:眼睛图标像心脏一样跳动 */
+  .eye-beat {
+    display: inline-block;
+    transform-origin: center;
+    animation: eyeBeat 1.2s ease-in-out infinite;
+  }
+  @keyframes eyeBeat {
+    0%, 100% { transform: scale(1); }
+    14% { transform: scale(1.35); }
+    28% { transform: scale(1); }
+    42% { transform: scale(1.28); }
+    70% { transform: scale(1); }
+  }
+
   /* ============ 爱意模式 ============ */
   /* 提交预订后:隐藏原生光标,改用自定义加粗"爱"字光标 */
   body.love-mode,
@@ -1478,19 +1492,77 @@
   const hiddenOverlay = document.getElementById('hiddenOverlay');
   const exitHiddenBtn = document.getElementById('exitHiddenBtn');
   let foundNames = new Set(JSON.parse(localStorage.getItem('foundPersons') || '[]'));
+
+  // 隐藏界面:页面所有文字变成"我看见你了"
+  let textSnapshots = [];
+  let textReplaced = false;
+
+  function replaceAllText() {
+    if (textReplaced) return;
+    const walker = document.createTreeWalker(document.body, NodeFilter.SHOW_TEXT);
+    const nodes = [];
+    while (walker.nextNode()) {
+      const n = walker.currentNode;
+      const tag = n.parentElement && n.parentElement.tagName;
+      if (tag === 'SCRIPT' || tag === 'STYLE') continue;
+      if (n.nodeValue.trim()) nodes.push(n);
+    }
+    // 纯图标/符号(emoji、星号、箭头等)→ 换成会跳动的眼睛;其余文字 → 我看见你了
+    const emojiOnly = /^[\s\u{1F300}-\u{1FAFF}\u{2600}-\u{27BF}\u{2B00}-\u{2BFF}\u{2190}-\u{21FF}\u{FE0F}\u{200D}\u{20E3}\u{25A0}-\u{25FF}\u{24C2}]*$/u;
+    textSnapshots = [];
+    nodes.forEach(n => {
+      const rec = { node: n, value: n.nodeValue, span: null };
+      textSnapshots.push(rec);
+      if (emojiOnly.test(n.nodeValue)) {
+        const span = document.createElement('span');
+        span.className = 'eye-beat';
+        span.textContent = '👁';
+        n.parentNode.replaceChild(span, n);
+        rec.span = span;
+      } else {
+        n.nodeValue = '我看见你了';
+      }
+    });
+    // 输入框占位文字也换掉
+    document.querySelectorAll('input[placeholder]').forEach(i => {
+      i.dataset.origPlaceholder = i.placeholder;
+      i.placeholder = '我看见你了';
+    });
+    textReplaced = true;
+  }
+
+  function restoreAllText() {
+    if (!textReplaced) return;
+    textSnapshots.forEach(r => {
+      if (r.span) {
+        r.span.parentNode.replaceChild(r.node, r.span);
+      } else {
+        r.node.nodeValue = r.value;
+      }
+    });
+    textSnapshots = [];
+    document.querySelectorAll('input[placeholder]').forEach(i => {
+      if (i.dataset.origPlaceholder) { i.placeholder = i.dataset.origPlaceholder; delete i.dataset.origPlaceholder; }
+    });
+    textReplaced = false;
+  }
+
   if (localStorage.getItem('hiddenMode') === '1' && foundNames.size >= 3) {
     hiddenOverlay.classList.add('show');
+    replaceAllText();
   }
 
   function unlockHidden() {
     if (localStorage.getItem('hiddenMode') === '1') return;
     hiddenOverlay.classList.add('show');
     localStorage.setItem('hiddenMode', '1');
+    replaceAllText();
     showToast('🎉 彩蛋解锁!集齐三个名字,隐藏反转界面开启!');
   }
   exitHiddenBtn.addEventListener('click', () => {
     hiddenOverlay.classList.remove('show');
     localStorage.setItem('hiddenMode', '0');
+    restoreAllText();
   });
 
   searchForm.addEventListener('submit', e => {
