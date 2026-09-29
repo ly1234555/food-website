@@ -1,0 +1,636 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>幸福路社区居民委员会 - 全心全意为人民服务</title>
+<style>
+  :root {
+    --red: #c7000b;
+    --red-dark: #a30008;
+    --gold: #d4a017;
+    --bg: #f2f2f2;
+    --card: #ffffff;
+    --text: #333;
+    --muted: #888;
+    --line: #ddd;
+  }
+  * { margin: 0; padding: 0; box-sizing: border-box; }
+  html { scroll-behavior: smooth; }
+  body {
+    font-family: "PingFang SC", "Hiragino Sans GB", "Microsoft YaHei", "Noto Sans SC", sans-serif;
+    background: var(--bg);
+    color: var(--text);
+    line-height: 1.7;
+    font-size: 15px;
+  }
+  a { color: inherit; }
+
+  /* ===== 顶部政务条 ===== */
+  .top-strip {
+    background: #f8f8f8;
+    border-bottom: 1px solid var(--line);
+    font-size: 13px;
+    color: #666;
+  }
+  .top-strip-inner {
+    max-width: 1200px;
+    margin: 0 auto;
+    padding: 6px 16px;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    flex-wrap: wrap;
+    gap: 6px;
+  }
+  .top-strip .gov { color: var(--red); font-weight: 700; }
+  .top-strip .back-link { color: var(--red); text-decoration: none; }
+  .top-strip .back-link:hover { text-decoration: underline; }
+
+  /* ===== 红头横幅 ===== */
+  .banner {
+    background: linear-gradient(160deg, #d9000f 0%, var(--red) 55%, #b00008 100%);
+    color: #fff;
+    text-align: center;
+    padding: 34px 16px 30px;
+    position: relative;
+    overflow: hidden;
+  }
+  .banner::before {
+    content: "★";
+    position: absolute;
+    left: 30px; top: 50%;
+    transform: translateY(-50%);
+    font-size: 72px;
+    color: rgba(255, 255, 255, .16);
+  }
+  .banner::after {
+    content: "★";
+    position: absolute;
+    right: 30px; top: 50%;
+    transform: translateY(-50%);
+    font-size: 72px;
+    color: rgba(255, 255, 255, .16);
+  }
+  .banner h1 {
+    font-size: clamp(1.6rem, 4vw, 2.5rem);
+    font-family: "SimSun", "NSimSun", serif;
+    letter-spacing: 8px;
+    font-weight: 900;
+    text-shadow: 0 2px 6px rgba(0, 0, 0, .25);
+  }
+  .banner .sub {
+    margin-top: 8px;
+    font-family: "KaiTi", "STKaiti", serif;
+    font-size: 1.05rem;
+    letter-spacing: 4px;
+    opacity: .95;
+  }
+
+  /* ===== 滚动公告条 ===== */
+  .marquee {
+    background: var(--red-dark);
+    color: #fff;
+    font-size: 13.5px;
+    overflow: hidden;
+    white-space: nowrap;
+  }
+  .marquee-inner {
+    display: inline-block;
+    padding: 8px 0;
+    animation: marqueeMove 26s linear infinite;
+  }
+  @keyframes marqueeMove {
+    0% { transform: translateX(100%); }
+    100% { transform: translateX(-100%); }
+  }
+
+  /* ===== 导航 ===== */
+  .nav {
+    background: #fff;
+    border-bottom: 3px solid var(--red);
+    position: sticky;
+    top: 0;
+    z-index: 100;
+    box-shadow: 0 2px 8px rgba(0, 0, 0, .06);
+  }
+  .nav-inner {
+    max-width: 1200px;
+    margin: 0 auto;
+    display: flex;
+    flex-wrap: wrap;
+  }
+  .nav a {
+    padding: 13px 22px;
+    text-decoration: none;
+    color: #444;
+    font-weight: 700;
+    font-size: 15px;
+    border-bottom: 3px solid transparent;
+    transition: all .2s;
+  }
+  .nav a:hover, .nav a.active {
+    color: var(--red);
+    border-bottom-color: var(--red);
+    background: #fff6f6;
+  }
+
+  /* ===== 主体 ===== */
+  .main {
+    max-width: 1200px;
+    margin: 20px auto;
+    padding: 0 16px;
+    display: grid;
+    grid-template-columns: 1fr 320px;
+    gap: 20px;
+    align-items: start;
+  }
+  @media (max-width: 900px) {
+    .main { grid-template-columns: 1fr; }
+  }
+
+  .content { display: flex; flex-direction: column; gap: 20px; }
+  .panel {
+    background: var(--card);
+    border: 1px solid var(--line);
+    border-top: 3px solid var(--red);
+    padding: 22px 26px;
+  }
+  .panel h2 {
+    font-family: "SimSun", "NSimSun", serif;
+    font-size: 1.35rem;
+    color: var(--red);
+    border-left: 6px solid var(--red);
+    padding-left: 12px;
+    margin-bottom: 18px;
+  }
+  .panel h2 small { font-size: .72rem; color: var(--muted); font-family: inherit; margin-left: 8px; font-weight: 400; }
+
+  /* ===== 社区概况 ===== */
+  .stats-grid {
+    display: grid;
+    grid-template-columns: repeat(4, 1fr);
+    gap: 14px;
+    margin-bottom: 20px;
+  }
+  @media (max-width: 700px) { .stats-grid { grid-template-columns: repeat(2, 1fr); } }
+  .stat-box {
+    background: linear-gradient(160deg, #fff6f6, #fff);
+    border: 1px solid #f3d9d9;
+    border-radius: 8px;
+    text-align: center;
+    padding: 16px 8px;
+  }
+  .stat-box .num { font-size: 1.7rem; font-weight: 900; color: var(--red); }
+  .stat-box .label { font-size: 13px; color: var(--muted); margin-top: 4px; }
+  .about-text p { text-indent: 2em; margin-bottom: 10px; }
+  .about-text strong { color: var(--red-dark); }
+
+  /* ===== 表格 ===== */
+  table.gov-table {
+    width: 100%;
+    border-collapse: collapse;
+    font-size: 14px;
+  }
+  table.gov-table th, table.gov-table td {
+    border: 1px solid #ccc;
+    padding: 9px 10px;
+    text-align: left;
+    vertical-align: top;
+  }
+  table.gov-table th {
+    background: #fdf0f0;
+    color: var(--red-dark);
+    font-weight: 700;
+    text-align: center;
+    white-space: nowrap;
+  }
+  table.gov-table tr:nth-child(even) td { background: #fafafa; }
+  table.gov-table .center { text-align: center; }
+
+  /* ===== 通知公告 ===== */
+  .notice-list { list-style: none; }
+  .notice-list li {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    padding: 13px 4px;
+    border-bottom: 1px dashed #e5e5e5;
+    flex-wrap: wrap;
+  }
+  .notice-list li:last-child { border-bottom: none; }
+  .notice-tag {
+    flex-shrink: 0;
+    background: var(--red);
+    color: #fff;
+    font-size: 12px;
+    font-weight: 700;
+    padding: 2px 9px;
+    border-radius: 3px;
+    letter-spacing: 2px;
+  }
+  .notice-tag.blue { background: #1a66b3; }
+  .notice-tag.orange { background: #e67e00; }
+  .notice-list a {
+    flex: 1;
+    text-decoration: none;
+    color: #333;
+    font-size: 14.5px;
+    min-width: 200px;
+  }
+  .notice-list a:hover { color: var(--red); text-decoration: underline; }
+  .notice-date { color: var(--muted); font-size: 13px; flex-shrink: 0; }
+
+  /* ===== 服务卡片 ===== */
+  .service-grid {
+    display: grid;
+    grid-template-columns: repeat(2, 1fr);
+    gap: 14px;
+  }
+  @media (max-width: 700px) { .service-grid { grid-template-columns: 1fr; } }
+  .service-card {
+    border: 1px solid #f0d9d9;
+    border-radius: 8px;
+    padding: 16px 18px;
+    background: #fffafa;
+  }
+  .service-card h3 { color: var(--red-dark); font-size: 1rem; margin-bottom: 6px; }
+  .service-card p { font-size: 13.5px; color: #555; }
+
+  /* ===== 侧栏 ===== */
+  .side { display: flex; flex-direction: column; gap: 20px; }
+  .side .panel { padding: 18px 20px; }
+  .side .panel h3 {
+    font-size: 1.05rem;
+    color: var(--red);
+    text-align: center;
+    padding-bottom: 10px;
+    border-bottom: 2px solid var(--red);
+    margin-bottom: 14px;
+  }
+  .quick-links { list-style: none; }
+  .quick-links li { border-bottom: 1px dashed #e5e5e5; }
+  .quick-links li:last-child { border-bottom: none; }
+  .quick-links a {
+    display: block;
+    padding: 9px 6px;
+    text-decoration: none;
+    color: #444;
+    font-size: 14px;
+  }
+  .quick-links a:hover { color: var(--red); padding-left: 12px; }
+  .quick-links a::before { content: "▶ "; color: var(--red); font-size: 11px; }
+  .phone-list { font-size: 13.5px; }
+  .phone-list div {
+    display: flex;
+    justify-content: space-between;
+    padding: 5px 0;
+    border-bottom: 1px dotted #eee;
+  }
+  .phone-list div:last-child { border-bottom: none; }
+  .phone-list b { color: var(--red-dark); }
+  .tip-box {
+    background: #fff6f6;
+    border: 1px solid #f3c9c9;
+    border-radius: 8px;
+    padding: 14px 16px;
+    font-size: 13.5px;
+    color: #a33;
+  }
+  .tip-box h4 { color: var(--red); margin-bottom: 6px; }
+  .duty-table { width: 100%; border-collapse: collapse; font-size: 13px; }
+  .duty-table th, .duty-table td { border: 1px solid #e0caca; padding: 6px 8px; text-align: center; }
+  .duty-table th { background: #fdf0f0; color: var(--red-dark); }
+
+  /* ===== 地图占位 ===== */
+  .map-box {
+    height: 240px;
+    border: 1px dashed #c99;
+    border-radius: 8px;
+    background:
+      repeating-linear-gradient(0deg, transparent, transparent 39px, #f3e8e8 39px, #f3e8e8 40px),
+      repeating-linear-gradient(90deg, transparent, transparent 39px, #f3e8e8 39px, #f3e8e8 40px),
+      #fffafa;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    color: #b66;
+    font-size: 14px;
+    text-align: center;
+  }
+  .contact-grid { display: flex; flex-wrap: wrap; gap: 16px 40px; margin-bottom: 16px; }
+  .contact-grid div { font-size: 14.5px; }
+  .contact-grid b { color: var(--red-dark); }
+
+  /* ===== 页脚 ===== */
+  footer {
+    background: #8f0006;
+    color: #e8d5d5;
+    text-align: center;
+    padding: 26px 16px 30px;
+    font-size: 13px;
+    line-height: 2;
+    margin-top: 30px;
+  }
+  footer .f-title { color: #fff; font-size: 15px; font-weight: 700; letter-spacing: 3px; }
+  footer .f-links a { color: #f0b9b9; text-decoration: none; margin: 0 8px; }
+  footer .f-links a:hover { text-decoration: underline; }
+  footer .beian { color: #d9a8a8; }
+
+  .date-chip { white-space: nowrap; }
+</style>
+</head>
+<body>
+
+<!-- 顶部政务条 -->
+<div class="top-strip">
+  <div class="top-strip-inner">
+    <span><span class="gov">幸福路社区居民委员会</span> 主办 | 服务电话:0571-8888-6666</span>
+    <span class="date-chip">
+      2026年9月29日 星期一 · 晴转多云 18~26℃ 东南风2级
+      &nbsp;|&nbsp; <a class="back-link" href="index.html">← 返回食光小馆</a>
+    </span>
+  </div>
+</div>
+
+<!-- 红头横幅 -->
+<div class="banner">
+  <h1>幸福路社区居民委员会</h1>
+  <div class="sub">—— 全心全意为人民服务 ——</div>
+</div>
+
+<!-- 滚动公告 -->
+<div class="marquee">
+  <div class="marquee-inner">
+    ★ 欢迎访问幸福路社区网上服务平台!办公时间:周一至周五 8:30-12:00,14:00-17:30;周六 9:00-12:00 值班服务&nbsp;&nbsp;★ 社区24小时值班电话:0571-8888-6666&nbsp;&nbsp;★ 反诈提醒:凡是自称"公检法"要求转账的,都是诈骗!&nbsp;&nbsp;★ 2026年度城乡居民医保集中缴费期为9月1日至12月31日,请居民及时参保&nbsp;&nbsp;★ 台风"海棠"已生成,请各小区物业做好防汛排查
+  </div>
+</div>
+
+<!-- 导航 -->
+<nav class="nav">
+  <div class="nav-inner">
+    <a href="#about" class="active">首页概况</a>
+    <a href="#notice">通知公告</a>
+    <a href="#party">社区党建</a>
+    <a href="#grid">网格管理</a>
+    <a href="#guide">办事指南</a>
+    <a href="#service">便民服务</a>
+    <a href="#contact">联系我们</a>
+  </div>
+</nav>
+
+<!-- 主体 -->
+<div class="main">
+  <!-- 左侧内容 -->
+  <div class="content">
+
+    <!-- 社区概况 -->
+    <section class="panel" id="about">
+      <h2>社区概况<small>ABOUT US</small></h2>
+      <div class="stats-grid">
+        <div class="stat-box"><div class="num">0.86</div><div class="label">辖区面积(平方公里)</div></div>
+        <div class="stat-box"><div class="num">3860</div><div class="label">总户数(户)</div></div>
+        <div class="stat-box"><div class="num">1.2万</div><div class="label">常住人口(人)</div></div>
+        <div class="stat-box"><div class="num">8</div><div class="label">管理网格(个)</div></div>
+      </div>
+      <div class="about-text">
+        <p><strong>幸福路社区</strong>成立于2005年7月,隶属幸福街道办事处管辖。辖区四至:东起幸福路,西至平安街,南临光明大道,北接建设路,总面积0.86平方公里。</p>
+        <p>辖内有<strong>幸福家园、阳光花园、和谐苑、盛世豪庭、幸福里、锦翠华庭、江南春天、紫金湾</strong>8个住宅小区,共3860户,常住人口约1.2万人,户籍人口8653人,其中60周岁以上老年人1876人,残疾人156人,低保家庭42户。</p>
+        <p>社区党委下辖8个网格党支部、16个党小组,现有在册党员<strong>231名</strong>。社区设有"一站式"服务大厅,开设综合受理窗口7个,可办理社保、医保、计生、民政等各类服务事项,实行"一窗受理、集成服务"。</p>
+        <p>近年来,社区先后荣获"市级文明社区""省级充分就业社区""全国综合减灾示范社区"等荣誉称号。社区始终秉持"民有所呼、我有所应"的服务理念,努力建设和谐宜居的幸福家园。</p>
+      </div>
+      <h2 style="font-size:1.1rem; margin-top:10px;">社区领导班子</h2>
+      <table class="gov-table">
+        <tr><th style="width:32%;">姓名</th><th>职务</th><th>分管工作</th></tr>
+        <tr><td class="center">陈国华</td><td>党委书记</td><td>主持全面工作</td></tr>
+        <tr><td class="center">王丽萍</td><td>党委副书记、居委会主任</td><td>行政事务、民政、老龄</td></tr>
+        <tr><td class="center">李建国</td><td>党委委员、居委会副主任</td><td>综合治理、城市管理、安全</td></tr>
+        <tr><td class="center">张秀英</td><td>党委委员、居委会副主任</td><td>计划生育、妇联、卫健</td></tr>
+        <tr><td class="center">刘志刚</td><td>居委会委员</td><td>文体活动、关工委</td></tr>
+        <tr><td class="center">周晓梅</td><td>居委会委员</td><td>社保、就业、财务</td></tr>
+        <tr><td class="center">郑晓东</td><td>居委会委员</td><td>消防安全、防汛防台</td></tr>
+        <tr><td class="center">孙丽娟</td><td>居委会委员</td><td>档案、统计、宣传</td></tr>
+      </table>
+    </section>
+
+    <!-- 通知公告 -->
+    <section class="panel" id="notice">
+      <h2>通知公告<small>NOTICE</small></h2>
+      <ul class="notice-list">
+        <li>
+          <span class="notice-tag">通知</span>
+          <a href="#">关于2026年国庆节期间社区文化活动安排的通知(文艺汇演、露天电影、便民集市)</a>
+          <span class="notice-date">2026-09-28</span>
+        </li>
+        <li>
+          <span class="notice-tag">通知</span>
+          <a href="#">关于开展2026年度城乡居民基本医疗保险参保缴费工作的通知(个人缴费标准420元/年)</a>
+          <span class="notice-date">2026-09-25</span>
+        </li>
+        <li>
+          <span class="notice-tag">通知</span>
+          <a href="#">关于开展秋季爱国卫生运动暨集中灭鼠灭蟑工作的通知(投药期间请看护好儿童和宠物)</a>
+          <span class="notice-date">2026-09-20</span>
+        </li>
+        <li>
+          <span class="notice-tag blue">公告</span>
+          <a href="#">阳光花园小区南门道路维修施工公告(9月22日至10月8日,请居民绕行东门)</a>
+          <span class="notice-date">2026-09-19</span>
+        </li>
+        <li>
+          <span class="notice-tag orange">预警</span>
+          <a href="#">反诈预警:警惕冒充"社区工作人员"上门收费、代办补贴类电信诈骗</a>
+          <span class="notice-date">2026-09-18</span>
+        </li>
+        <li>
+          <span class="notice-tag">通知</span>
+          <a href="#">关于做好第15号台风"海棠"防御工作的通知(请居民加固门窗、清理阳台杂物)</a>
+          <span class="notice-date">2026-09-12</span>
+        </li>
+        <li>
+          <span class="notice-tag blue">公告</span>
+          <a href="#">社区老年助餐点(食光小馆)恢复供应公告</a>
+          <span class="notice-date">2026-09-08</span>
+        </li>
+      </ul>
+    </section>
+
+    <!-- 社区党建 -->
+    <section class="panel" id="party">
+      <h2>社区党建<small>PARTY BUILDING</small></h2>
+      <div class="about-text">
+        <p>社区党委始终坚持党建引领基层治理,严格执行"三会一课"制度,每月<strong>15日</strong>为固定主题党日,组织党员开展学习教育和志愿服务。8个网格党支部实现"支部建在网格上",231名党员全部亮身份、践承诺,设立党员先锋岗26个。</p>
+      </div>
+      <table class="gov-table">
+        <tr><th style="width:26%;">时间</th><th>活动内容</th></tr>
+        <tr><td class="center">2026年7月</td><td>"七一"表彰大会暨"光荣在党50年"纪念章颁发仪式</td></tr>
+        <tr><td class="center">2026年7月-8月</td><td>党纪学习教育专题读书班(分4期,党员参学率100%)</td></tr>
+        <tr><td class="center">2026年8月</td><td>"党员进小区"环境整治志愿服务活动(参与党员186人次)</td></tr>
+        <tr><td class="center">2026年9月</td><td>"红色电影进社区"放映月活动(每周五晚,已放映5场)</td></tr>
+        <tr><td class="center">2026年10月</td><td>计划开展"重阳敬老"党员结对走访慰问活动</td></tr>
+      </table>
+    </section>
+
+    <!-- 网格管理 -->
+    <section class="panel" id="grid">
+      <h2>网格管理<small>GRID MANAGEMENT</small></h2>
+      <div class="about-text">
+        <p>社区按照"属地管理、界线清晰、规模适度、无缝覆盖"的原则,将辖区划分为<strong>8个基础网格</strong>,配备网格长8名、专职网格员8名,实现"人在格中走、事在格中办"。居民有任何问题,可直接联系所在网格的网格员。</p>
+      </div>
+      <table class="gov-table">
+        <tr><th style="width:8%;">网格</th><th style="width:24%;">范围</th><th style="width:12%;">网格长</th><th style="width:12%;">网格员</th><th>联系电话</th></tr>
+        <tr><td class="center">第1网格</td><td>幸福家园1-6幢</td><td class="center">陈志强</td><td class="center">刘芳</td><td>0571-8888-6101</td></tr>
+        <tr><td class="center">第2网格</td><td>幸福家园7-13幢</td><td class="center">王建国</td><td class="center">李婷</td><td>0571-8888-6102</td></tr>
+        <tr><td class="center">第3网格</td><td>阳光花园</td><td class="center">张丽华</td><td class="center">赵敏</td><td>0571-8888-6103</td></tr>
+        <tr><td class="center">第4网格</td><td>和谐苑</td><td class="center">周永强</td><td class="center">孙悦</td><td>0571-8888-6104</td></tr>
+        <tr><td class="center">第5网格</td><td>盛世豪庭</td><td class="center">吴桂英</td><td class="center">郑浩</td><td>0571-8888-6105</td></tr>
+        <tr><td class="center">第6网格</td><td>幸福里</td><td class="center">徐国栋</td><td class="center">钱静</td><td>0571-8888-6106</td></tr>
+        <tr><td class="center">第7网格</td><td>锦翠华庭</td><td class="center">何玉珍</td><td class="center">韩磊</td><td>0571-8888-6107</td></tr>
+        <tr><td class="center">第8网格</td><td>江南春天、紫金湾</td><td class="center">高建华</td><td class="center">冯雪</td><td>0571-8888-6108</td></tr>
+      </table>
+    </section>
+
+    <!-- 办事指南 -->
+    <section class="panel" id="guide">
+      <h2>办事指南<small>SERVICE GUIDE</small></h2>
+      <div class="about-text">
+        <p>以下事项均可在社区服务大厅"一站式"办理。办理时间:周一至周五 8:30-12:00,14:00-17:30。咨询电话:0571-8888-6667。</p>
+      </div>
+      <table class="gov-table">
+        <tr><th style="width:20%;">办理事项</th><th style="width:44%;">所需材料</th><th style="width:16%;">办理时限</th><th>办理窗口</th></tr>
+        <tr><td>居住证申领</td><td>身份证原件及复印件、居住证明(租赁合同或房产证)、近期一寸照片2张</td><td class="center">5个工作日</td><td class="center">1号窗口</td></tr>
+        <tr><td>生育登记(一孩/二孩)</td><td>夫妻双方身份证、户口簿、结婚证</td><td class="center">即办即取</td><td class="center">2号窗口</td></tr>
+        <tr><td>独生子女父母奖励扶助金</td><td>身份证、户口簿、结婚证、《独生子女父母光荣证》、本人银行卡</td><td class="center">15个工作日</td><td class="center">2号窗口</td></tr>
+        <tr><td>城乡居民基本医疗保险参保</td><td>身份证、户口簿(外地户籍另需居住证)</td><td class="center">即办即取</td><td class="center">3号窗口</td></tr>
+        <tr><td>最低生活保障申请</td><td>身份证、户口簿、收入证明、财产申报表(因病致困的另附病历材料)</td><td class="center">30个工作日(含公示7天)</td><td class="center">4号窗口</td></tr>
+        <tr><td>老年人优待证办理</td><td>身份证、一寸照片2张</td><td class="center">10个工作日</td><td class="center">5号窗口</td></tr>
+        <tr><td>就业困难人员认定</td><td>身份证、户口簿、《就业创业证》、相关证明材料</td><td class="center">10个工作日</td><td class="center">6号窗口</td></tr>
+        <tr><td>退役军人优待证申领</td><td>身份证、退役证、户口簿、一寸白底照片3张</td><td class="center">20个工作日</td><td class="center">7号窗口</td></tr>
+      </table>
+    </section>
+
+    <!-- 便民服务 -->
+    <section class="panel" id="service">
+      <h2>便民服务<small>CONVENIENCE SERVICE</small></h2>
+      <div class="service-grid">
+        <div class="service-card">
+          <h3>🍚 老年助餐点</h3>
+          <p>设于食光小馆(幸福路88号一层),60周岁以上老人凭助餐卡享10元套餐;周一至周五 11:00-13:00 供应。</p>
+        </div>
+        <div class="service-card">
+          <h3>💈 免费理发</h3>
+          <p>每月10日上午 9:00-11:30,社区活动中心一楼,面向60周岁以上老年人,凭身份证参加。</p>
+        </div>
+        <div class="service-card">
+          <h3>⚖️ 法律咨询</h3>
+          <p>每周三下午 14:00-17:00,社区调解室,公益律师坐班,免费提供法律咨询与矛盾调解。</p>
+        </div>
+        <div class="service-card">
+          <h3>🩺 健康义诊</h3>
+          <p>每月最后一个周六上午,社区卫生服务站,免费量血压、测血糖、健康咨询。</p>
+        </div>
+        <div class="service-card">
+          <h3>📚 四点半课堂</h3>
+          <p>工作日 16:30-18:00,社区图书室,为双职工家庭小学生提供免费托管与作业辅导。</p>
+        </div>
+        <div class="service-card">
+          <h3>🔧 便民维修</h3>
+          <p>小家电维修:每周二下午;水电维修:登记后24小时内上门,市场价8折,困难家庭免费。</p>
+        </div>
+      </div>
+    </section>
+
+    <!-- 联系我们 -->
+    <section class="panel" id="contact">
+      <h2>联系我们<small>CONTACT US</small></h2>
+      <div class="contact-grid">
+        <div><b>📍 地址:</b>幸福路88号社区服务大厅(食光大厦一层)</div>
+        <div><b>📞 值班电话:</b>0571-8888-6666(24小时)</div>
+        <div><b>📞 服务大厅:</b>0571-8888-6667</div>
+        <div><b>📮 电子邮箱:</b>xflsq@example.com</div>
+        <div><b>🕐 办公时间:</b>周一至周五 8:30-12:00,14:00-17:30;周六 9:00-12:00(值班)</div>
+        <div><b>🚌 公交线路:</b>5路、18路、36路至"幸福路站"下车步行200米</div>
+      </div>
+      <div class="map-box">
+        地图位置示意图<br>幸福路88号 · 幸福路社区居民委员会
+      </div>
+    </section>
+  </div>
+
+  <!-- 右侧侧栏 -->
+  <div class="side">
+    <div class="panel">
+      <h3>📋 本周值班安排</h3>
+      <table class="duty-table">
+        <tr><th>日期</th><th>值班领导</th><th>值班员</th></tr>
+        <tr><td>周一</td><td>陈国华</td><td>刘芳</td></tr>
+        <tr><td>周二</td><td>王丽萍</td><td>李婷</td></tr>
+        <tr><td>周三</td><td>李建国</td><td>赵敏</td></tr>
+        <tr><td>周四</td><td>张秀英</td><td>孙悦</td></tr>
+        <tr><td>周五</td><td>刘志刚</td><td>郑浩</td></tr>
+        <tr><td>周六</td><td>周晓梅</td><td>钱静</td></tr>
+        <tr><td>周日</td><td>郑晓东</td><td>韩磊</td></tr>
+      </table>
+    </div>
+
+    <div class="panel">
+      <h3>⚡ 快速通道</h3>
+      <ul class="quick-links">
+        <li><a href="#guide">办事指南查询</a></li>
+        <li><a href="#notice">通知公告</a></li>
+        <li><a href="#grid">联系网格员</a></li>
+        <li><a href="#service">便民服务预约</a></li>
+        <li><a href="#">居民意见箱</a></li>
+        <li><a href="#">物业服务监督</a></li>
+      </ul>
+    </div>
+
+    <div class="panel">
+      <h3>☎️ 常用便民电话</h3>
+      <div class="phone-list">
+        <div><span>社区值班电话</span><b>8888-6666</b></div>
+        <div><span>幸福路派出所</span><b>8888-6110</b></div>
+        <div><span>电力服务热线</span><b>95598</b></div>
+        <div><span>供水服务热线</span><b>96510</b></div>
+        <div><span>燃气报修</span><b>96777</b></div>
+        <div><span>社区卫生服务站</span><b>8888-6301</b></div>
+        <div><span>物业(幸福家园)</span><b>8888-6201</b></div>
+        <div><span>急救 / 火警</span><b>120 / 119</b></div>
+      </div>
+    </div>
+
+    <div class="panel">
+      <h3>⚠️ 温馨提示</h3>
+      <div class="tip-box">
+        <h4>反诈提醒</h4>
+        凡是自称"社区工作人员"上门收取费用的,请先拨打社区电话核实;凡是自称"公检法"要求转账的,都是诈骗!如遇可疑情况,请拨打反诈专线 <b>96110</b>。
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- 页脚 -->
+<footer>
+  <div class="f-title">幸福路社区居民委员会</div>
+  <div>地址:幸福路88号 &nbsp;|&nbsp; 电话:0571-8888-6666 &nbsp;|&nbsp; 邮箱:xflsq@example.com</div>
+  <div class="f-links">
+    <a href="#about">关于我们</a>|<a href="#contact">联系方式</a>|<a href="#">网站地图</a>|<a href="#">隐私声明</a>|<a href="#">免责声明</a>
+  </div>
+  <div class="beian">
+    主办单位:幸福路社区居民委员会 &nbsp;|&nbsp; 技术支持:社区信息化办公室<br>
+    浙ICP备2026000666号-1 &nbsp;&nbsp; 浙公网安备 33010602000666号
+  </div>
+</footer>
+
+<script>
+  // 导航高亮
+  const navLinks = document.querySelectorAll('.nav a');
+  navLinks.forEach(a => {
+    a.addEventListener('click', () => {
+      navLinks.forEach(x => x.classList.remove('active'));
+      a.classList.add('active');
+    });
+  });
+</script>
+</body>
+</html>

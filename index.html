@@ -1497,6 +1497,11 @@
     e.preventDefault();
     const q = searchInput.value.trim();
     if (!q) return;
+    // 幸福路:跳转到幸福路社区网页
+    if (q.replace(/\s/g, '').includes('幸福路')) {
+      window.location.href = 'shequ.html';
+      return;
+    }
     const hit = persons.find(p => q.replace(/\s/g, '').includes(p.name));
     if (hit) {
       foundPhoto.src = hit.img;
@@ -1509,7 +1514,7 @@
       localStorage.setItem('foundPersons', JSON.stringify([...foundNames]));
       if (foundNames.size >= 3) unlockHidden();
     } else {
-      showToast('🔍 没有搜到「' + q + '」,提示:试试搜索"张雅雯 / 李梓毓 / 姚孟彤"');
+      showToast('🔍 没有搜到「' + q + '」,提示:试试搜索"张雅雯 / 李梓毓 / 姚孟彤 / 幸福路"');
     }
   });
   document.getElementById('searchClose').addEventListener('click', () => {
