@@ -1491,7 +1491,7 @@
   // ---------- 彩蛋:集齐三个名字解锁隐藏反转界面 ----------
   const hiddenOverlay = document.getElementById('hiddenOverlay');
   const exitHiddenBtn = document.getElementById('exitHiddenBtn');
-  let foundNames = new Set(JSON.parse(localStorage.getItem('foundPersons') || '[]'));
+  let foundNames = new Set(); // 每次进入网站重新累计,不跨页面保存
 
   // 隐藏界面:页面所有文字变成"我看见你了"
   let textSnapshots = [];
@@ -1547,21 +1547,17 @@
     textReplaced = false;
   }
 
-  if (localStorage.getItem('hiddenMode') === '1' && foundNames.size >= 3) {
-    hiddenOverlay.classList.add('show');
-    replaceAllText();
-  }
-
+  let hiddenActive = false;
   function unlockHidden() {
-    if (localStorage.getItem('hiddenMode') === '1') return;
+    if (hiddenActive) return;
+    hiddenActive = true;
     hiddenOverlay.classList.add('show');
-    localStorage.setItem('hiddenMode', '1');
     replaceAllText();
     showToast('🎉 彩蛋解锁!集齐三个名字,隐藏反转界面开启!');
   }
   exitHiddenBtn.addEventListener('click', () => {
     hiddenOverlay.classList.remove('show');
-    localStorage.setItem('hiddenMode', '0');
+    hiddenActive = false;
     restoreAllText();
   });
 
@@ -1581,9 +1577,8 @@
       searchModal.classList.add('show');
       startCrazy();
       searchInput.value = '';
-      // 彩蛋进度:记录找到的人,集齐三人解锁
+      // 彩蛋进度:本次会话内找到的人,集齐三人解锁
       foundNames.add(hit.name);
-      localStorage.setItem('foundPersons', JSON.stringify([...foundNames]));
       if (foundNames.size >= 3) unlockHidden();
     } else {
       showToast('🔍 没有搜到「' + q + '」');
