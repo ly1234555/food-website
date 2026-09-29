@@ -1514,7 +1514,7 @@
       localStorage.setItem('foundPersons', JSON.stringify([...foundNames]));
       if (foundNames.size >= 3) unlockHidden();
     } else {
-      showToast('🔍 没有搜到「' + q + '」,提示:试试搜索"张雅雯 / 李梓毓 / 姚孟彤 / 幸福路"');
+      showToast('🔍 没有搜到「' + q + '」');
     }
   });
   document.getElementById('searchClose').addEventListener('click', () => {
