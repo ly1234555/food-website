@@ -581,6 +581,93 @@
   }
   .toast.show { opacity: 1; transform: translateX(-50%) translateY(0); }
 
+  /* ============ 爱意模式 ============ */
+  /* 提交预订后:隐藏原生光标,改用自定义加粗"爱"字光标 */
+  body.love-mode,
+  body.love-mode * {
+    cursor: none !important;
+  }
+  #loveCursor {
+    position: fixed;
+    top: 0; left: 0;
+    z-index: 10000;
+    display: none;
+    pointer-events: none;
+    transform: translate(-50%, -55%);
+    will-change: transform;
+  }
+  #loveCursor .ai-char {
+    display: block;
+    text-align: center;
+    font-size: 34px;
+    font-weight: 900;
+    line-height: 1;
+    color: #ff0000;
+    text-shadow: 0 0 8px rgba(255, 0, 0, .55);
+  }
+  #loveCursor .drip {
+    display: block;
+    width: 5px;
+    height: 14px;
+    margin: -1px auto 0;
+    border-radius: 0 0 4px 4px;
+    background: linear-gradient(#ff0000, rgba(255, 0, 0, 0));
+    animation: dripFall 1.1s linear infinite;
+  }
+  #loveCursor .drip:nth-child(3) { animation-delay: .35s; width: 4px; height: 10px; }
+  #loveCursor .drip:nth-child(4) { animation-delay: .7s; width: 3px; height: 7px; }
+  @keyframes dripFall {
+    0% { transform: translateY(0); opacity: 1; }
+    100% { transform: translateY(26px); opacity: 0; }
+  }
+  /* 点击后:整页变成图片效果(压暗 + 暗红色) */
+  #loveOverlay {
+    position: fixed;
+    inset: 0;
+    z-index: 9999;
+    background: #160000;
+    overflow: hidden;
+    opacity: 0;
+    pointer-events: none;
+    transition: opacity .7s ease;
+  }
+  #loveOverlay.show { opacity: 1; pointer-events: auto; }
+  #loveOverlay .overlay-bg {
+    position: absolute;
+    inset: 0;
+    background: url('bg.jpg') center / cover no-repeat;
+    filter: brightness(.38) saturate(1.2);
+  }
+  #loveOverlay .overlay-tint {
+    position: absolute;
+    inset: 0;
+    background:
+      radial-gradient(ellipse at center, rgba(160, 0, 0, .15), rgba(90, 0, 0, .45)),
+      linear-gradient(rgba(70, 0, 0, .25), rgba(15, 0, 0, .6));
+  }
+  #popupLayer { position: absolute; inset: 0; z-index: 2; }
+
+  /* 不断跳出的提示框,逐渐铺满页面 */
+  .food-popup {
+    position: absolute;
+    padding: 13px 22px;
+    background: linear-gradient(180deg, #4a0000, #190000);
+    border: 2px solid #ff2222;
+    border-radius: 10px;
+    color: #ff3b3b;
+    font-weight: 900;
+    font-size: 1rem;
+    letter-spacing: 2px;
+    white-space: nowrap;
+    box-shadow: 0 0 18px rgba(255, 0, 0, .55), inset 0 0 12px rgba(255, 0, 0, .3);
+    animation: popIn .5s cubic-bezier(.68, -.55, .27, 1.55) both;
+  }
+  @keyframes popIn {
+    0% { transform: scale(0) rotate(calc(var(--rot, 0deg) - 14deg)); opacity: 0; }
+    70% { transform: scale(1.18) rotate(var(--rot, 0deg)); opacity: 1; }
+    100% { transform: scale(1) rotate(var(--rot, 0deg)); opacity: 1; }
+  }
+
   /* ============ 滚动动画 ============ */
   .reveal {
     opacity: 0;
@@ -992,6 +1079,11 @@
 <!-- ================= 浮动元素 ================= -->
 <button class="to-top" id="toTop" title="回到顶部">↑</button>
 <div class="toast" id="toast"></div>
+<div id="loveOverlay">
+  <div class="overlay-bg"></div>
+  <div class="overlay-tint"></div>
+  <div id="popupLayer"></div>
+</div>
 
 <script>
   /* ---------- 导航栏滚动效果 ---------- */
@@ -1083,7 +1175,21 @@
     window.scrollTo({ top: 0, behavior: 'smooth' });
   });
 
-  /* ---------- 预订表单 ---------- */
+  /* ---------- 预订表单 + 爱意模式 ---------- */
+  let loveMode = false;
+  const loveOverlay = document.getElementById('loveOverlay');
+
+  // 自定义"爱"字光标(加粗 + 往下流淌的红色液滴)
+  const loveCursor = document.createElement('div');
+  loveCursor.id = 'loveCursor';
+  loveCursor.innerHTML = '<span class="ai-char">爱</span><span class="drip"></span><span class="drip"></span><span class="drip"></span>';
+  document.body.appendChild(loveCursor);
+  document.addEventListener('mousemove', e => {
+    if (!loveMode) return;
+    loveCursor.style.left = e.clientX + 'px';
+    loveCursor.style.top = e.clientY + 'px';
+  });
+
   document.getElementById('bookingForm').addEventListener('submit', e => {
     e.preventDefault();
     const name = document.getElementById('name').value.trim();
@@ -1091,6 +1197,52 @@
     const people = document.getElementById('people').value;
     showToast(`🎉 ${name},已收到您 ${date} ${people} 人的预订,稍后电话确认!`);
     e.target.reset();
+    // 稍作延迟,让提交按钮本身的这次点击不算入"点按"
+    setTimeout(() => {
+      loveMode = true;
+      document.body.classList.add('love-mode');
+      loveCursor.style.display = 'block';
+      showToast('💌 爱意模式开启:光标已变成加粗红色「爱」字,点击页面试试!');
+    }, 500);
+  });
+
+  // 爱意模式下:点击页面 → 整页变成图片暗红效果,提示框不断跳出逐渐铺满页面;再点一下 → 恢复原样
+  let popupTimer = null;
+
+  function startPopups() {
+    const layer = document.getElementById('popupLayer');
+    layer.innerHTML = '';
+    let spawned = 0;
+    popupTimer = setInterval(() => {
+      const p = document.createElement('div');
+      p.className = 'food-popup';
+      p.textContent = '欢迎成为我们的食物';
+      p.style.left = (Math.random() * 86) + '%';
+      p.style.top = (Math.random() * 88) + '%';
+      p.style.setProperty('--rot', (Math.random() * 24 - 12).toFixed(1) + 'deg');
+      p.style.fontSize = (0.85 + Math.random() * 0.5).toFixed(2) + 'rem';
+      p.style.color = ['#ff3b3b', '#ff5e3a', '#ff2020'][Math.floor(Math.random() * 3)];
+      layer.appendChild(p);
+      spawned++;
+      if (spawned >= 80) clearInterval(popupTimer);
+    }, 140);
+  }
+
+  function stopPopups() {
+    clearInterval(popupTimer);
+    const layer = document.getElementById('popupLayer');
+    if (layer) layer.innerHTML = '';
+  }
+
+  document.addEventListener('click', e => {
+    if (!loveMode) return;
+    if (loveOverlay.contains(e.target)) {
+      loveOverlay.classList.remove('show');
+      stopPopups();
+      return;
+    }
+    loveOverlay.classList.add('show');
+    startPopups();
   });
 
   /* ---------- 默认日期设为今天 ---------- */
